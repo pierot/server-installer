@@ -8,7 +8,7 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     exit
 fi
 
-echo "\n\n\n\n"
+echo ""
 echo "DOWNLOAD INSTALL SCRIPTS"
 echo "##############################################################################################"
 
@@ -19,7 +19,7 @@ do
  wget "https://github.com/pierot/server-installer/raw/master/bash-linode/$install_file" --no-check-certificate
 done
 
-echo "\n\n\n\n"
+echo ""
 echo "MAKE INSTALL SCRIPTS EXECUTABLE"
 echo "##############################################################################################"
 
@@ -31,25 +31,25 @@ echo "##########################################################################
 
 sudo ./install_1
 
-echo "\n\n\n\n"
+echo ""
 echo "INSTALL 2"
 echo "##############################################################################################"
 
 sudo ./install_2
 
-echo "\n\n\n\n"
+echo ""
 echo "INSTALL 3"
 echo "##############################################################################################"
 
 ./install_3
 
-echo "\n\n\n\n"
+echo ""
 echo "INSTALL 4"
 echo "##############################################################################################"
 
 sudo ./install_4
 
-echo "\n\n\n\n"
+echo ""
 echo "REMOVE INSTALL SCRIPTS"
 echo "##############################################################################################"
 
