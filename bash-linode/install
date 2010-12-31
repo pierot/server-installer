@@ -2,26 +2,45 @@
 
 # bash < <( curl https://github.com/pierot/server-installer/raw/master/bash-linode/install )
 
-# REQUIRE ROOT USER
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-    echo "Not running as root"
+    echo "NOT RUNNING AS ROOT! ABORT."
     exit
 fi
 
-# DOWNLOAD SCRIPTS
+echo "\n\n\n\n"
+echo "DOWNLOAD INSTALL SCRIPTS"
+echo "##############################################################################################"
 wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_1 --no-check-certificate
 wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_2 --no-check-certificate
 wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_3 --no-check-certificate
 wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_4 --no-check-certificate
 
-# MAKE EXEC
+echo "\n\n\n\n"
+echo "MAKE INSTALL SCRIPTS EXECUTABLE"
+echo "##############################################################################################"
 chmod +x install*
 
 # EXECUTE
+echo "INSTALL 1"
+echo "##############################################################################################"
 sudo ./install_1
+
+echo "\n\n\n\n"
+echo "INSTALL 2"
+echo "##############################################################################################"
 sudo ./install_2
+
+echo "\n\n\n\n"
+echo "INSTALL 3"
+echo "##############################################################################################"
 ./install_3
+
+echo "\n\n\n\n"
+echo "INSTALL 4"
+echo "##############################################################################################"
 sudo ./install_4
 
-# REMOVE ALL
+echo "\n\n\n\n"
+echo "REMOVE INSTALL SCRIPTS"
+echo "##############################################################################################"
 rm install*
