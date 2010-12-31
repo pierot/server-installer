@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# $ bash < <( curl http://xxx )
+# bash < <( curl https://github.com/pierot/server-installer/raw/master/bash-linode/install )
 
 # REQUIRE ROOT USER
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
