@@ -11,37 +11,46 @@ fi
 echo "\n\n\n\n"
 echo "DOWNLOAD INSTALL SCRIPTS"
 echo "##############################################################################################"
-wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_1 --no-check-certificate
-wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_2 --no-check-certificate
-wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_3 --no-check-certificate
-wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_4 --no-check-certificate
+
+install_files=('install_1' 'install_2' 'install_3' 'install_4')
+
+for install_file in ${install_files[@]}
+do
+ wget "https://github.com/pierot/server-installer/raw/master/bash-linode/$install_file" --no-check-certificate
+done
 
 echo "\n\n\n\n"
 echo "MAKE INSTALL SCRIPTS EXECUTABLE"
 echo "##############################################################################################"
+
 chmod +x install*
 
 # EXECUTE
 echo "INSTALL 1"
 echo "##############################################################################################"
+
 sudo ./install_1
 
 echo "\n\n\n\n"
 echo "INSTALL 2"
 echo "##############################################################################################"
+
 sudo ./install_2
 
 echo "\n\n\n\n"
 echo "INSTALL 3"
 echo "##############################################################################################"
+
 ./install_3
 
 echo "\n\n\n\n"
 echo "INSTALL 4"
 echo "##############################################################################################"
+
 sudo ./install_4
 
 echo "\n\n\n\n"
 echo "REMOVE INSTALL SCRIPTS"
 echo "##############################################################################################"
+
 rm install*
