@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-sudo su # ROOR USER
+#sudo su # ROOT USER
 
 # RVM (RUBY)
 bash < <( curl -L http://bit.ly/rvm-install-system-wide )
@@ -30,8 +30,8 @@ echo '  . "/usr/local/rvm/scripts/rvm"' >> /etc/skel/.bashrc
 echo 'fi' >> /etc/skel/.bashrc
 
 # Add current user to rvm group
-usermod -aG rvm pirate
+usermod -aG rvm `/usr/bin/whoami`
 
-exit # EXIT SUDO SU
+#exit # EXIT SUDO SU
 
 source ~/.bashrc

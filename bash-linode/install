@@ -2,7 +2,13 @@
 
 # $ bash < <( curl http://xxx )
 
-sudo su # ROOR USER
+# REQUIRE ROOT USER
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo "Not running as root"
+    exit
+fi
+
+#sudo su # ROOT USER
 
 # START
 apt-get --yes --quiet update && apt-get --yes --quiet upgrade
@@ -12,4 +18,4 @@ apt-get --yes --quiet install build-essential bison openssl libreadline5 libread
 apt-get --yes --quiet git-core zlib1g zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev sqlite3 
 apt-get --yes --quiet libcurl4-openssl-dev libreadline-dev libxml2-dev git-core subversion autoconf
 
-exit # EXIT SUDO SU
+#exit # EXIT SUDO SU
