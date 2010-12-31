@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
+sudo su # ROOR USER
+
 # RVM (RUBY)
-sudo bash < <( curl -L http://bit.ly/rvm-install-system-wide )
+bash < <( curl -L http://bit.ly/rvm-install-system-wide )
 
 #echo '# RVM \n' >> ~/.bashrc
 #echo '[[ -s "/usr/local/rvm/scripts/rvm" ]] && source "/usr/local/rvm/scripts/rvm"' >> ~/.bashrc
@@ -29,5 +31,7 @@ echo 'fi' >> /etc/skel/.bashrc
 
 # Add current user to rvm group
 usermod -aG rvm pirate
+
+exit # EXIT SUDO SU
 
 source ~/.bashrc

@@ -4,6 +4,8 @@
 gem install passenger
 passenger-install-nginx-module
 
+sudo su # ROOR USER
+
 # NGINX DAEMON
 cd /opt
 wget https://library.linode.com/frameworks/ruby-on-rails-nginx/reference/init-deb.sh
@@ -12,15 +14,18 @@ chmod +x /etc/init.d/nginx
 /usr/sbin/update-rc.d -f nginx defaults
 /etc/init.d/nginx start
 
-# MYSQL
-apt-get apt-get --yes --quiet install mysql-server
-
-mysql_secure_installation
-
-apt-get --yes --quiet install libmysqlclient15-dev libmysql-ruby
-gem install mysql --no-rdoc --no-ri -- --with-mysql-dir=/usr/bin --with-mysql-lib=/usr/lib/mysql --with-mysql-include=/usr/include/mysql
-
 # PHP
 mkdir /var/www
 apt-get --yes --quiet install php5-fpm
 /etc/init.d/php5-fpm start
+
+# MYSQL
+apt-get --yes --quiet install mysql-server
+
+mysql_secure_installation
+
+apt-get --yes --quiet install libmysqlclient15-dev libmysql-ruby
+
+exit # EXIT SUDO SU
+
+gem install mysql --no-rdoc --no-ri -- --with-mysql-dir=/usr/bin --with-mysql-lib=/usr/lib/mysql --with-mysql-include=/usr/include/mysql
