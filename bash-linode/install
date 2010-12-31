@@ -8,14 +8,20 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     exit
 fi
 
-#sudo su # ROOT USER
+# DOWNLOAD SCRIPTS
+wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_1 --no-check-certificate
+wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_2 --no-check-certificate
+wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_3 --no-check-certificate
+wget https://github.com/pierot/server-installer/raw/master/bash-linode/install_4 --no-check-certificate
 
-# START
-apt-get --yes --quiet update && apt-get --yes --quiet upgrade
+# MAKE EXEC
+chmod +x install*
 
-# BASE
-apt-get --yes --quiet install build-essential bison openssl libreadline5 libreadline-dev curl 
-apt-get --yes --quiet git-core zlib1g zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev sqlite3 
-apt-get --yes --quiet libcurl4-openssl-dev libreadline-dev libxml2-dev git-core subversion autoconf
+# EXECUTE
+sudo ./install_1
+sudo ./install_2
+./install_3
+sudo ./install_4
 
-#exit # EXIT SUDO SU
+# REMOVE ALL
+rm install*
