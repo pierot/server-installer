@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# sudo apt-get install curl
 # bash < <( curl https://github.com/pierot/server-installer/raw/master/bash-linode/install )
 
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
