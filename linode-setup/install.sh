@@ -19,6 +19,7 @@ Options:
   -n '1.0.6'        nginx version number
   -p 'password'     MySQL password
   "
+
   exit 0
 } 
 
@@ -479,10 +480,10 @@ _the_end() {
 
 ###############################################################################
 
-server_name=""
+server_name=
 nginx_version="1.0.6"
 env_var="production"
-pass=""
+pass=
 
 while getopts :hs:n:e:p: opt; do 
   case $opt in
@@ -504,21 +505,23 @@ while getopts :hs:n:e:p: opt; do
     *)
       _log "Invalid option received"
 
-      return
+      _usage
+
+      exit 0
       ;;
   esac 
 done
 
-if [ -n $server_name ]; then
+if [ -z $server_name ]; then
   _log "-s 'server_name' not given."
 
-  exit
+  exit 0
 fi
 
-if [ -n $pass ]; then
+if [ -z $pass ]; then
   _log "-p 'password' not given."
 
-  exit
+  exit 0
 fi
 
 ###############################################################################
