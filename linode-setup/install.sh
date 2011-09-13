@@ -5,11 +5,11 @@ export DEBIAN_FRONTEND=noninteractive
 ###############################################################################
 
 _usage() {
-  printf "
+  _print "
 
 Usage:              install.sh -h 'server_name' -p 'password' [-n '1.0.6' -e 'production']
 
-Remote Usage:        
+Remote Usage:       bash <( curl https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' -p 'test' [-n '1.0.6' -e 'production']
 
 Options:
  
@@ -25,11 +25,62 @@ Options:
 
 ###############################################################################
 
+server_name=
+nginx_version="1.0.6"
+env_var="production"
+pass=
+
+while getopts :hs:n:e:p: opt; do 
+  case $opt in
+    h)
+      _usage
+      ;;
+    s)
+      server_name=$OPTARG
+      ;;
+    n)
+      nginx_version=$OPTARG
+      ;;
+    e)
+      env_var=$OPTARG
+      ;;
+    p)
+      pass=$OPTARG
+      ;;
+    *)
+      _log "Invalid option received"
+
+      _usage
+
+      exit 0
+      ;;
+  esac 
+done
+
+if [ -z $server_name ]; then
+  _log "-s 'server_name' not given."
+
+  exit 0
+fi
+
+if [ -z $pass ]; then
+  _log "-p 'password' not given."
+
+  exit 0
+fi
+
+###############################################################################
+
 _log() {
+  # echo -e $COL_BLUE"\n$1 ************************************\n"$COL_RESET
+  _print "$1 ******************************************"
+}
+
+_print() {
 	COL_BLUE="\x1b[34;01m"
 	COL_RESET="\x1b[39;49;00m"
 
-  echo -e $COL_BLUE"\n$1 ************************************\n"$COL_RESET
+  printf $COL_BLUE"\n$1\n"$COL_RESET
 }
 
 _system_installs_install() {
@@ -480,52 +531,6 @@ _the_end() {
 
 ###############################################################################
 
-server_name=
-nginx_version="1.0.6"
-env_var="production"
-pass=
-
-while getopts :hs:n:e:p: opt; do 
-  case $opt in
-    h)
-      _usage
-      ;;
-    s)
-      server_name=$OPTARG
-      ;;
-    n)
-      nginx_version=$OPTARG
-      ;;
-    e)
-      env_var=$OPTARG
-      ;;
-    p)
-      pass=$OPTARG
-      ;;
-    *)
-      _log "Invalid option received"
-
-      _usage
-
-      exit 0
-      ;;
-  esac 
-done
-
-if [ -z $server_name ]; then
-  _log "-s 'server_name' not given."
-
-  exit 0
-fi
-
-if [ -z $pass ]; then
-  _log "-p 'password' not given."
-
-  exit 0
-fi
-
-###############################################################################
-
 _hostname $server_name
 _system_installs
 _system_timezone
@@ -536,7 +541,7 @@ _postfix_loopback_only
 _rvm
 _gem_config
 _mysql_install $pass && _mysql_tune 90
-_passenger_nginx $nginx_version # nginx version
+_passenger_nginx $nginx_version
 _php
 
 _setup_www
@@ -544,6 +549,6 @@ _setup_noort
 
 _munin
 
-_env_variables $env_var # (rails/rack_env, ...)
+_env_variables $env_var
 _the_end
 
