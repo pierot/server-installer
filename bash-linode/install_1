@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# START
-apt-get --yes --quiet update && apt-get --yes --quiet upgrade
-
-# BASE
-apt-get --yes --quiet install build-essential bison openssl libreadline5 libreadline-dev
-apt-get --yes --quiet install zlib1g zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev sqlite3 
-apt-get --yes --quiet install libcurl4-openssl-dev libreadline-dev libxml2-dev autoconf subversion git-core
