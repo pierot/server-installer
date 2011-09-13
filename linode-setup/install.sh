@@ -29,7 +29,7 @@ _usage() {
 
 Usage:              install.sh -h 'server_name' -p 'password' [-n '1.0.6' -e 'production']
 
-Remote Usage:       bash <( curl https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' -p 'test' [-n '1.0.6' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' -p 'test' [-n '1.0.6' -e 'production']
 
 Options:
  
