@@ -2,7 +2,27 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
+server_name=
+nginx_version="1.0.6"
+env_var="production"
+pass=
+
+temp_dir='/tmp/src'
+
 ###############################################################################
+# HELPER FUNCTIONS
+
+_log() {
+  # echo -e $COL_BLUE"\n$1 ************************************\n"$COL_RESET
+  _print "$1 ******************************************"
+}
+
+_print() {
+	COL_BLUE="\x1b[34;01m"
+	COL_RESET="\x1b[39;49;00m"
+
+  printf $COL_BLUE"\n$1\n"$COL_RESET
+}
 
 _usage() {
   _print "
@@ -24,11 +44,6 @@ Options:
 } 
 
 ###############################################################################
-
-server_name=
-nginx_version="1.0.6"
-env_var="production"
-pass=
 
 while getopts :hs:n:e:p: opt; do 
   case $opt in
@@ -70,18 +85,7 @@ if [ -z $pass ]; then
 fi
 
 ###############################################################################
-
-_log() {
-  # echo -e $COL_BLUE"\n$1 ************************************\n"$COL_RESET
-  _print "$1 ******************************************"
-}
-
-_print() {
-	COL_BLUE="\x1b[34;01m"
-	COL_RESET="\x1b[39;49;00m"
-
-  printf $COL_BLUE"\n$1\n"$COL_RESET
-}
+# HELPER FUNCTION
 
 _system_installs_install() {
 	[[ -z "$1" ]] && return 1
@@ -93,11 +97,11 @@ _system_installs_install() {
 
 ###############################################################################
 
-temp_dir='/tmp/src'
+_prepare() {
+  _log "Prepare"
 
-mkdir -p $temp_dir
-
-###############################################################################
+  mkdir -p $temp_dir
+}
 
 _hostname() {
 	[[ -z "$1" ]] && return 1
