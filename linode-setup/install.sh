@@ -535,6 +535,8 @@ _the_end() {
 
 ###############################################################################
 
+_prepare
+
 _hostname $server_name
 _system_installs
 _system_timezone
