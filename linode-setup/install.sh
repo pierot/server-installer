@@ -175,10 +175,6 @@ _postfix_loopback_only() {
 _rvm() {
 	_log "Installing RVM System wide"
 
-  _log "***** Add bundler to global.gems"
-
-  sudo sh -c 'echo "bundler" >> /usr/local/rvm/gemsets/global.gems'
-
   _log "***** Execute install-system-wide for rvm"
 
   sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
@@ -212,6 +208,10 @@ _rvm() {
   _log "***** Now source!"
 
   source /usr/local/lib/rvm
+
+  _log "***** Add bundler to global.gems"
+
+  sudo sh -c 'echo "bundler" >> /usr/local/rvm/gemsets/global.gems'
 
   _log "***** Reload shell"
   
@@ -308,9 +308,9 @@ _passenger_nginx() {
   _log "***** Add nginx gzip level"
 
   gzip_level="
-gzip  on;
-gzip_comp_level 2;
-gzip_disable \"msie6\";"
+    gzip  on;
+    gzip_comp_level 2;
+    gzip_disable \"msie6\";"
   
   search_string="s/\#gzip  on;/$gzip_level/"
 
@@ -351,7 +351,7 @@ server {
   access_log /srv/logs/$1.access.log;
   error_log /srv/logs/$1.error.log;
 
-  # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+  # pass the PHP scripts to FastCGI server
   location ~ \.php$ {
     root           html;
     fastcgi_pass   127.0.0.1:9000;
