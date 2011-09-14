@@ -26,7 +26,7 @@ _print() {
 _error() {
 	COL_RED="\x1b[31;01m"
 
-  _print $COL_RED"$1"
+  _print $COL_RED"Error:\n$1\n"
 }
 
 _usage() {
