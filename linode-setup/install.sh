@@ -172,11 +172,23 @@ _rvm() {
 
   sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
 
-  _log "***** Add sourcing of rvm"
+  _log "***** Add sourcing of rvm in ~/.bashrc"
 
-  search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
+  rvm_bin_source="fi\n
+  if groups | grep -q rvm ; then\n
+    source '/usr/local/lib/rvm'\n
+  fi\n
+  "
 
-  sudo perl -pi -e "$search_string" ~/.bashrc 
+  if [ -f ~/.bashrc ]; then
+    search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
+
+    sudo perl -pi -e "$search_string" ~/.bashrc 
+
+    echo -e $rvm_bin_source | sudo tee -a ~/.bashrc > /dev/null
+  fi
+  
+  _log "***** Add sourcing of rvm in /etc/skel/.bashrc"
   
   if [ -f /etc/skel/.bashrc ]; then
     sudo perl -pi -e "$search_string" /etc/skel/.bashrc
@@ -185,13 +197,6 @@ _rvm() {
     sudo sh -c "$ps_string > /etc/skel/.bashrc"
   fi
 
-  rvm_bin_source="fi\n
-  if groups | grep -q rvm ; then\n
-    source '/usr/local/lib/rvm'\n
-  fi\n
-  "
-
-  echo -e $rvm_bin_source | sudo tee -a ~/.bashrc > /dev/null
   echo -e $rvm_bin_source | sudo tee -a /etc/skel/.bashrc > /dev/null
 
   source /usr/local/lib/rvm
@@ -211,7 +216,7 @@ _rvm() {
   _log "***** Installing Ruby 1.9.2"
 
   rvm install 1.9.2
-  rvm use 1.9.2 --default
+  rvm --default use 1.9.2
   
   _log "***** Add bundler to global.gems"
 
