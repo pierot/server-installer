@@ -13,7 +13,6 @@ temp_dir='/tmp/src'
 # HELPER FUNCTIONS
 
 _log() {
-  # echo -e $COL_BLUE"\n$1 ************************************\n"$COL_RESET
   _print "$1 ******************************************"
 }
 
@@ -22,6 +21,12 @@ _print() {
 	COL_RESET="\x1b[39;49;00m"
 
   printf $COL_BLUE"\n$1\n"$COL_RESET
+}
+
+_error() {
+	COL_RED="\x1b[31;01m"
+
+  _print $COL_RED"$1"
 }
 
 _usage() {
@@ -63,7 +68,7 @@ while getopts :hs:n:e:p: opt; do
       pass=$OPTARG
       ;;
     *)
-      _log "Invalid option received"
+      _error "Invalid option received"
 
       _usage
 
@@ -73,13 +78,13 @@ while getopts :hs:n:e:p: opt; do
 done
 
 if [ -z $server_name ]; then
-  _log "-s 'server_name' not given."
+  _error "-s 'server_name' not given."
 
   exit 0
 fi
 
 if [ -z $pass ]; then
-  _log "-p 'password' not given."
+  _error "-p 'password' not given."
 
   exit 0
 fi
@@ -170,10 +175,18 @@ _postfix_loopback_only() {
 _rvm() {
 	_log "Installing RVM System wide"
 
+  _log "***** Add bundler to global.gems"
+
+  sudo sh -c 'echo "bundler" >> /usr/local/rvm/gemsets/global.gems'
+
+  _log "***** Execute install-system-wide for rvm"
+
   sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
 
   _log "***** Add sourcing of rvm in ~/.bashrc"
 
+  ps_string='[ -z "$PS1" ] && return'
+  search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
   rvm_bin_source="fi\n
   if groups | grep -q rvm ; then\n
     source '/usr/local/lib/rvm'\n
@@ -181,8 +194,6 @@ _rvm() {
   "
 
   if [ -f ~/.bashrc ]; then
-    search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
-
     sudo perl -pi -e "$search_string" ~/.bashrc 
 
     echo -e $rvm_bin_source | sudo tee -a ~/.bashrc > /dev/null
@@ -193,11 +204,12 @@ _rvm() {
   if [ -f /etc/skel/.bashrc ]; then
     sudo perl -pi -e "$search_string" /etc/skel/.bashrc
   else
-  	ps_string='[ -z "$PS1" ] && return'
     sudo sh -c "$ps_string > /etc/skel/.bashrc"
   fi
 
   echo -e $rvm_bin_source | sudo tee -a /etc/skel/.bashrc > /dev/null
+
+  _log "***** Now source!"
 
   source /usr/local/lib/rvm
 
@@ -213,14 +225,10 @@ _rvm() {
    
   rvm install 1.8.7
 
-  _log "***** Installing Ruby 1.9.2"
+  _log "***** Installing Ruby 1.9.2 (default)"
 
   rvm install 1.9.2
   rvm --default use 1.9.2
-  
-  _log "***** Add bundler to global.gems"
-
-  sudo sh -c 'echo "bundler" >> /usr/local/rvm/gemsets/global.gems'
 }
 
 _gem_config() {
@@ -244,14 +252,13 @@ gem: --no-ri --no-rdoc\n
   echo -e $gemrc_settings | sudo tee -a /etc/skel/.gemrc > /dev/null
   echo -e $gemrc_settings | sudo tee -a ~/.gemrc > /dev/null
 
-  # Bundler
-	_log "***** Installing Bundler"
+	# _log "***** Installing Bundler"
 
-  rvm gemset use global
-  
-  gem install bundler
+  # rvm gemset use global
+  # 
+  # gem install bundler
 
-  rvm gemset clear
+  # rvm gemset clear
 }
 
 _passenger_nginx() {
@@ -305,7 +312,7 @@ gzip  on;
 gzip_comp_level 2;
 gzip_disable \"msie6\";"
   
-  search_string="s/\#gzip  on;/$gzip_lebel/"
+  search_string="s/\#gzip  on;/$gzip_level/"
 
   sudo perl -pi -e "$search_string" /opt/nginx/conf/nginx.conf
   
