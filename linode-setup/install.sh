@@ -1,48 +1,33 @@
 #!/usr/bin/env bash
 
-export DEBIAN_FRONTEND=noninteractive
+wget -N --quiet https://raw.github.com/pierot/server-installer/master/linode-setup/lib.sh; . ./lib.sh
+
+###############################################################################
 
 server_name=
 nginx_version="1.0.6"
 env_var="production"
 pass=
+nginx_dir='/opt/nginx'
 
 temp_dir='/tmp/src'
 
 ###############################################################################
-# HELPER FUNCTIONS
-
-_log() {
-  _print "$1 ******************************************"
-}
-
-_print() {
-	COL_BLUE="\x1b[34;01m"
-	COL_RESET="\x1b[39;49;00m"
-
-  printf $COL_BLUE"\n$1\n"$COL_RESET
-}
-
-_error() {
-	COL_RED="\x1b[31;01m"
-
-  _print $COL_RED"Error:\n$1\n"
-}
 
 _usage() {
   _print "
 
-Usage:              install.sh -h 'server_name' -p 'password' [-n '1.0.6' -e 'production']
+Usage:              install.sh -h 'server_name' [-n '1.0.6' -e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' -p 'test' [-n '1.0.6' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' [-n '1.0.6' -e 'production']
 
 Options:
  
   -h                Show this message
   -s 'server_name'  Set server name
-  -p 'environment'  Set RACK / RAILS environment variable
+  -d '/opt/nginx'   Sets nginx install dir
+  -e 'environment'  Set RACK / RAILS environment variable
   -n '1.0.6'        nginx version number
-  -p 'password'     MySQL password
   "
 
   exit 0
@@ -50,7 +35,7 @@ Options:
 
 ###############################################################################
 
-while getopts :hs:n:e:p: opt; do 
+while getopts :hs:n:d:e: opt; do 
   case $opt in
     h)
       _usage
@@ -58,14 +43,14 @@ while getopts :hs:n:e:p: opt; do
     s)
       server_name=$OPTARG
       ;;
+    d)
+      nginx_dir=$OPTARG
+      ;;
     n)
       nginx_version=$OPTARG
       ;;
     e)
       env_var=$OPTARG
-      ;;
-    p)
-      pass=$OPTARG
       ;;
     *)
       _error "Invalid option received"
@@ -82,23 +67,6 @@ if [ -z $server_name ]; then
 
   exit 0
 fi
-
-if [ -z $pass ]; then
-  _error "-p 'password' not given."
-
-  exit 0
-fi
-
-###############################################################################
-# HELPER FUNCTION
-
-_system_installs_install() {
-	[[ -z "$1" ]] && return 1
-
-  _log "***** Install $1"
-
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y -f install $1
-}
 
 ###############################################################################
 
@@ -132,6 +100,7 @@ _system_installs() {
   _system_installs_install 'zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev sqlite3 libcurl4-openssl-dev gcc'
   _system_installs_install 'libreadline-dev libxslt-dev libxml2-dev subversion autoconf gettext'
   _system_installs_install 'libmagickwand-dev imagemagick'
+  _system_installs_install 'chkconfig lsof'
 }
 
 _system_timezone() {
@@ -154,22 +123,6 @@ _setup_users() {
   # Do not permit source routing of incoming packets
   sudo sysctl -w net.ipv4.conf.all.accept_source_route=0
   sudo sysctl -w net.ipv4.conf.default.accept_source_route=0
-}
-
-_postfix_loopback_only() {
-	_log "Install postfix"
-
-  # Installs postfix and configure to listen only on the local interface. Also allows for local mail delivery
-  
-  echo "postfix postfix/main_mailer_type select Internet Site" | debconf-set-selections
-  echo "postfix postfix/mailname string localhost" | debconf-set-selections
-  echo "postfix postfix/destinations string localhost.localdomain, localhost" | debconf-set-selections
-
-  _system_installs_install 'postfix'
-
-  sudo /usr/sbin/postconf -e "inet_interfaces = loopback-only"
-  
-  sudo touch /tmp/restart-postfix
 }
 
 _rvm() {
@@ -254,11 +207,11 @@ gem: --no-ri --no-rdoc\n
 
 	# _log "***** Installing Bundler"
 
-  # rvm gemset use global
-  # 
-  # gem install bundler
+  rvm gemset use global
+  
+  gem install bundler
 
-  # rvm gemset clear
+  rvm gemset clear
 }
 
 _passenger_nginx() {
@@ -277,7 +230,7 @@ _passenger_nginx() {
   _log "***** Install passenger nginx module"
 
   # rvmsudo 
-  passenger-install-nginx-module --nginx-source-dir="$temp_dir/nginx-$1" --prefix="/opt/nginx" --auto --extra-configure-flags="--with-http_stub_status_module"
+  passenger-install-nginx-module --nginx-source-dir="$temp_dir/nginx-$1" --prefix=$nginx_dir --auto --extra-configure-flags="--with-http_stub_status_module"
 
   _log "***** Create global wrapper 'passenger'"
 
@@ -292,43 +245,45 @@ _passenger_nginx() {
 
   _log "***** Adding sites-folders"
 
-  sudo mkdir -p /opt/nginx/sites-available
-  sudo mkdir -p /opt/nginx/sites-enabled
+  sudo mkdir -p $nginx_dir"/sites-available"
+  sudo mkdir -p $nginx_dir"/sites-enabled"
 
-  _log "***** Add sites-enabled config"
+  _log "***** Add nginx config"
+
+  nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
 
   sites_enabled_config="
-      include \/opt\/nginx\/sites-enabled\/*;
+  http {
+      include $nginx_dir_escaped\/sites-enabled\/*;
   "
-
-  search_string="s/http {/http {$sites_enabled_config/"
-
-  sudo perl -pi -e "$search_string" /opt/nginx/conf/nginx.conf
-
-  _log "***** Add nginx gzip level"
 
   gzip_level="
     gzip  on;
     gzip_comp_level 2;
     gzip_disable \"msie6\";"
-  
-  search_string="s/\#gzip  on;/$gzip_level/"
 
-  sudo perl -pi -e "$search_string" /opt/nginx/conf/nginx.conf
-  
-  _log "***** Add nginx worker_processes"
+  _add_nginx_config "http {" $sites_enabled_config
 
-  worker_processes="worker_processes  3;"
+  _add_nginx_config "\#gzip  on;" $gzip_level
 
-  search_string="s/worker_processes  1;/$worker_processes/"
+  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  15;"
+  _add_nginx_config "worker_processes  1;" "worker_processes  3;"
 
-  sudo perl -pi -e "$search_string" /opt/nginx/conf/nginx.conf
+  _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;"
+  _add_nginx_config "tcp_nodelay        on;" "tcp_nodelay        off;"
+
+  _add_nginx_config "listen       80;" "listen       8888;"
+  _add_nginx_config "server_name  localhost;" "\# server_name  localhost;"
 
   _log "***** Verify nginx status"
 
   sudo /etc/init.d/nginx start
   sudo /etc/init.d/nginx stop
   sudo /etc/init.d/nginx start
+}
+
+_add_nginx_config() {
+  sudo perl -pi -e "s/$1/$2/" $nginx_dir"/conf/nginx.conf"
 }
 
 _php() {
@@ -342,8 +297,8 @@ _php() {
 _create_nginx_site() {
 	_log "Create site $1 at $3/"
 
-  sudo touch "/opt/nginx/sites-available/$1"
-  sudo cat > "/opt/nginx/sites-available/$1" <<EOS
+  sudo touch $nginx_dir"/sites-available/$1"
+  sudo cat > $nginx_dir"/sites-available/$1" <<EOS
 server {
   listen 80;
   server_name $2;
@@ -367,7 +322,7 @@ server {
 }
 EOS
 
-  sudo ln -s "/opt/nginx/sites-available/$1" "/opt/nginx/sites-enabled/$1"
+  sudo ln -s $nginx_dir"/sites-available/$1" $nginx_dir"/sites-enabled/$1"
   
   _log "***** Restart nginx"
 
@@ -390,142 +345,6 @@ _setup_noort() {
   git clone git://github.com/pierot/noort.be.git /srv/www/noort.be/public/
 
   _create_nginx_site "noort.be" "noort.be www.noort.be" "/srv/www/noort.be/public"
-}
-
-_mysql_install() {
-	_log "Install MySQL"
-
-  if [ ! -n "$1" ]; then
-    _log "mysql_install() requires the root pass as its first argument"
-    return 1;
-  fi
-
-  echo "mysql-server-5.1 mysql-server/root_password password $1" | debconf-set-selections
-  echo "mysql-server-5.1 mysql-server/root_password_again password $1" | debconf-set-selections
-
-  _system_installs_install 'mysql-server mysql-client libmysqlclient15-dev libmysql-ruby'
-
-	_log "***** Sleeping while MySQL starts up for the first time..."
-
-  sleep 5
-
-  gem install mysql -- --with-mysql-dir=/usr/bin --with-mysql-lib=/usr/lib/mysql --with-mysql-include=/usr/include/mysql
-}
-
-_mysql_tune() {
-  _log "MySQL Tune: $1"
-
-  # Tunes MySQL's memory usage to utilize the percentage of memory you specify, defaulting to 40%
-  # $1 - the percent of system memory to allocate towards MySQL
-
-  if [ ! -n "$1" ];
-    then PERCENT=40
-    else PERCENT="$1"
-  fi
-
-  sudo sed -i -e 's/^#skip-innodb/skip-innodb/' /etc/mysql/my.cnf # disable innodb - saves about 100M
-
-  MEM=$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo) # how much memory in MB this system has
-  MYMEM=$((MEM*PERCENT/100)) # how much memory we'd like to tune mysql with
-  MYMEMCHUNKS=$((MYMEM/4)) # how many 4MB chunks we have to play with
-  
-  # mysql config options we want to set to the percentages in the second list, respectively
-  OPTLIST=(key_buffer sort_buffer_size read_buffer_size read_rnd_buffer_size myisam_sort_buffer_size query_cache_size)
-  DISTLIST=(75 1 1 1 5 15)
-
-  for opt in ${OPTLIST[@]}; do
-    sudo sed -i -e "/\[mysqld\]/,/\[.*\]/s/^$opt/#$opt/" /etc/mysql/my.cnf
-  done
-
-  for i in ${!OPTLIST[*]}; do
-    val=$(echo | awk "{print int((${DISTLIST[$i]} * $MYMEMCHUNKS/100))*4}")
-    
-    if [ $val -lt 4 ]
-      then val=4
-    fi
-
-    config="${config}\n${OPTLIST[$i]} = ${val}M"
-  done
-
-  sudo sed -i -e "s/\(\[mysqld\]\)/\1\n$config\n/" /etc/mysql/my.cnf
-
-  sudo touch /tmp/restart-mysql
-}
-
-_munin() {
-  # https://github.com/jnstq/munin-nginx-ubuntu
-  _log "Install Munin"
-
-  _system_installs_install 'munin munin-node'
-
-  _log "***** Add munin-config to /etc/munin/munin.conf"
-
-  munin_config="\n
-[noort.be]\n
-\taddress 127.0.0.1\n
-\tuse_node_name yes\n
-"
-
-  echo -e $munin_config | sudo tee -a /etc/munin/munin.conf > /dev/null
-
-  _log "***** Add munin-node-config to /etc/munin/munin-node.conf"
-
-  munin_node_config="
-allow ^127\.0\.0\.1$\n
-host 127.0.0.1\n
-"
-
-  echo -e $munin_node_config | sudo tee -a /etc/munin/munin-node.conf > /dev/null
-
-  # Find and replace
-  _log "***** Add nginx-stub-status to /opt/nginx/conf/nginx.conf"
-
-  stub_status_config="
-
-        location \/nginx_status {
-          stub_status on;
-          access_log off;
-          allow 127.0.0.1;
-          deny all;
-        }
-
-  "
-
-  search_string="s/[^#]server {/server {$stub_status_config/"
-
-  sudo perl -pi -e "$search_string" /opt/nginx/conf/nginx.conf
-  
-  _log "***** Add munin plugins for requests, status and memory"
-
-  cd /usr/share/munin/plugins
-  sudo wget -q -O nginx_request http://exchange.munin-monitoring.org/plugins/nginx_request/version/2/download
-  sudo wget -q -O nginx_status http://exchange.munin-monitoring.org/plugins/nginx_status/version/3/download
-  sudo wget -q -O nginx_memory http://exchange.munin-monitoring.org/plugins/nginx_memory/version/1/download  
-
-  sudo chmod +x nginx_request
-  sudo chmod +x nginx_status
-  sudo chmod +x nginx_memory    
-
-  sudo ln -s /usr/share/munin/plugins/nginx_request /etc/munin/plugins/nginx_request
-  sudo ln -s /usr/share/munin/plugins/nginx_status /etc/munin/plugins/nginx_status
-  sudo ln -s /usr/share/munin/plugins/nginx_memory /etc/munin/plugins/nginx_memory     
-
-  _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
- 
-  munin_env="\n
-[nginx*]\n
-env.url http://localhost/nginx_status\n
-"
-
-  echo -e $munin_env | sudo tee -a /etc/munin/plugin-conf.d/munin-node > /dev/null
-  
-  _log "***** Restart munin"
-
-  sudo service munin-node restart
-
-  _log "***** Add nginx virtual host for munin-stats"
-
-  _create_nginx_site "stats.noort.be" "stats.noort.be s.noort.be" "/var/cache/munin/www"
 }
 
 _env_variables() {
@@ -554,18 +373,14 @@ _system_installs
 _system_timezone
 _setup_users
 
-_postfix_loopback_only
-
 _rvm
 _gem_config
-_mysql_install $pass && _mysql_tune 90
+
 _passenger_nginx $nginx_version
 _php
 
 _setup_www
 _setup_noort
-
-_munin
 
 _env_variables $env_var
 _the_end
