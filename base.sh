@@ -247,9 +247,9 @@ _passenger_nginx() {
   sites_enabled_config="http {\ninclude $nginx_dir_escaped\/sites-enabled\/*;"
   gzip_level="gzip on;\ngzip_comp_level 2;\ngzip_disable \"msie6\";"
 
-  _add_nginx_config "http {" $sites_enabled_config
+  _add_nginx_config "http {" "$sites_enabled_config"
 
-  _add_nginx_config "\#gzip  on;" $gzip_level
+  _add_nginx_config "\#gzip  on;" "$gzip_level"
 
   _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  15;"
   _add_nginx_config "worker_processes  1;" "worker_processes  3;"
