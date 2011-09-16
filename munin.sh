@@ -72,7 +72,7 @@ host 127.0.0.1\n
   echo -e $munin_node_config | sudo tee -a /etc/munin/munin-node.conf > /dev/null
 
   # Find and replace
-  _log "***** Add nginx-stub-status to "$nginx_dir"conf/nginx.conf"
+  _log "***** Add nginx-stub-status to "$nginx_dir"/conf/nginx.conf"
 
   stub_status_config="
 
@@ -87,7 +87,7 @@ host 127.0.0.1\n
 
   search_string="s/[^#]server {/server {$stub_status_config/"
 
-  sudo perl -pi -e "$search_string" $nginx_dir"conf/nginx.conf"
+  sudo perl -pi -e "$search_string" $nginx_dir"/conf/nginx.conf"
   
   _log "***** Add munin plugins for requests, status and memory"
 
