@@ -1,6 +1,27 @@
 Install scripts for server installations.
 =========================================
 
+Library
+-------
+Consists of the following functions:
+* _log
+* _error
+* _print
+* _system_installs_install
+* _check_root
+
+Variables:
+* $temp_dir
+* $COL_BLUE
+* $COL_RED
+* $COL_REST
+
+###Usage
+`wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh`
+
+At the top of your bash script. This way you can use all functions and variables in your script.
+
+
 Basic Linode install
 -------------------
 ### Installs
@@ -10,11 +31,11 @@ Basic Linode install
 * php-fpm
 
 ### Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.0.6' -e 'production']`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.0.6' -e 'production']`
 
 or for help and instructions
 
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/base.sh ) -h`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -h`
 
 Postfix install
 ---------------
@@ -22,7 +43,7 @@ Postfix install
 Postfix!
 
 ###Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/postfix.sh )`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/postfix.sh )`
 
 Munin install
 ---------------
@@ -30,7 +51,7 @@ Munin install
 Munin
 
 ###Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/munin.sh ) -d '/opt/nginx'`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/munin.sh ) -d '/opt/nginx'`
 
 MySQL install
 ---------------
@@ -38,10 +59,10 @@ MySQL install
 MySQL
 
 ###Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/mysql.sh ) -p 'password'`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/mysql.sh ) -p 'password'`
 
 Noort.be site
 ------------
 
 ###Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/noort_be.sh )`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/noort_be.sh )`
