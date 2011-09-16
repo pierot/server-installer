@@ -3,14 +3,14 @@ Install scripts for server installations.
 
 Library
 -------
-Consists of the following functions:
+### Functions:
 * _log
 * _error
 * _print
 * _system_installs_install
 * _check_root
 
-Variables:
+### Variables:
 * $temp_dir
 * $COL_BLUE
 * $COL_RED
