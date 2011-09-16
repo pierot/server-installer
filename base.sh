@@ -244,15 +244,8 @@ _passenger_nginx() {
 
   nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
 
-  sites_enabled_config="
-  http {
-      include $nginx_dir_escaped\/sites-enabled\/*;
-  "
-
-  gzip_level="
-    gzip  on;
-    gzip_comp_level 2;
-    gzip_disable \"msie6\";"
+  sites_enabled_config="http {\ninclude $nginx_dir_escaped\/sites-enabled\/*;"
+  gzip_level="gzip on;\ngzip_comp_level 2;\ngzip_disable \"msie6\";"
 
   _add_nginx_config "http {" $sites_enabled_config
 
