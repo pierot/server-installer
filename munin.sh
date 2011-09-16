@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wget -N --quiet https://raw.github.com/pierot/server-installer/master/linode-setup/lib.sh; . ./lib.sh
+wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
 ###############################################################################
 
@@ -13,7 +13,7 @@ _usage() {
 
 Usage:              munin.sh -d ['/opt/nginx']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/meunin.sh ) [-d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/munin.sh ) [-d '/opt/nginx']
 
 Options:
  

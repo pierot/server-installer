@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wget -N --quiet https://raw.github.com/pierot/server-installer/master/linode-setup/lib.sh; . ./lib.sh
+wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
 ###############################################################################
 
@@ -10,8 +10,6 @@ env_var="production"
 pass=
 nginx_dir='/opt/nginx'
 
-temp_dir='/tmp/src'
-
 ###############################################################################
 
 _usage() {
@@ -19,7 +17,7 @@ _usage() {
 
 Usage:              install.sh -h 'server_name' [-n '1.0.6' -e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga' [-n '1.0.6' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/install.sh ) -s 'tortuga' [-n '1.0.6' -e 'production']
 
 Options:
  
@@ -69,12 +67,6 @@ if [ -z $server_name ]; then
 fi
 
 ###############################################################################
-
-_prepare() {
-  _log "Prepare"
-
-  mkdir -p $temp_dir
-}
 
 _hostname() {
 	[[ -z "$1" ]] && return 1
@@ -320,8 +312,6 @@ _the_end() {
 }
 
 ###############################################################################
-
-_prepare
 
 _hostname $server_name
 _system_installs

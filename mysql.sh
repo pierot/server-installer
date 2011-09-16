@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-wget -N --quiet https://raw.github.com/pierot/server-installer/master/linode-setup/lib.sh; . ./lib.sh
+wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
 ###############################################################################
 
@@ -9,7 +9,7 @@ _usage() {
 
 Usage:              mysql.sh -p 'password'
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/mysql.sh ) -p 'test'
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/mysql.sh ) -p 'test'
 
 Options:
  

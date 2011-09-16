@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
-# HELPER FUNCTIONS
-
 export DEBIAN_FRONTEND=noninteractive
 
+# COLORS
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 COL_RED="\x1b[31;01m"
+
+# TEMP DIR FOR INSTALLS
+temp_dir='/tmp/src'
+mkdir -p $temp_dir
 
 _log() {
   _print "$1 ******************************************"
@@ -36,3 +39,5 @@ _check_root() {
     exit 0
   fi
 }
+
+_check_root
