@@ -16,4 +16,5 @@ apt-get install varnish
 #   with no server_name
 #   at port 8080
 
-
+# /etc/default/varnish
+# /etc/varnish/default.vcl

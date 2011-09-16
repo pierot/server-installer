@@ -28,3 +28,11 @@ _system_installs_install() {
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y -f install $1
 }
 
+_check_root() {
+  if [ $(/usr/bin/id -u) != "0" ]
+  then
+    _error 'Must be run by root user'
+
+    exit 0
+  fi
+}

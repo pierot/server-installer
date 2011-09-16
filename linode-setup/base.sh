@@ -294,57 +294,12 @@ _php() {
   sudo /etc/init.d/php5-fpm start
 }
 
-_create_nginx_site() {
-	_log "Create site $1 at $3/"
-
-  sudo touch $nginx_dir"/sites-available/$1"
-  sudo cat > $nginx_dir"/sites-available/$1" <<EOS
-server {
-  listen 80;
-  server_name $2;
-
-  access_log /srv/logs/$1.access.log;
-  error_log /srv/logs/$1.error.log;
-
-  # pass the PHP scripts to FastCGI server
-  location ~ \.php$ {
-    root           html;
-    fastcgi_pass   127.0.0.1:9000;
-    fastcgi_index  index.php;
-    fastcgi_param  SCRIPT_FILENAME  $3\$fastcgi_script_name;
-    include        fastcgi_params;
-  }
-
-  location / {
-    root $3/;
-    index  index.html index.php;
-  }
-}
-EOS
-
-  sudo ln -s $nginx_dir"/sites-available/$1" $nginx_dir"/sites-enabled/$1"
-  
-  _log "***** Restart nginx"
-
-  sudo /etc/init.d/nginx reload
-}
-
 _setup_www() {
 	_log "Setup www directories"
 
   sudo mkdir -p /srv
   sudo mkdir -p /srv/www
   sudo mkdir -p /srv/logs
-}
-
-_setup_noort() {
-	_log "Setup noort.be"
-
-  sudo mkdir -p /srv/www/noort.be/public
-
-  git clone git://github.com/pierot/noort.be.git /srv/www/noort.be/public/
-
-  _create_nginx_site "noort.be" "noort.be www.noort.be" "/srv/www/noort.be/public"
 }
 
 _env_variables() {
@@ -380,7 +335,6 @@ _passenger_nginx $nginx_version
 _php
 
 _setup_www
-_setup_noort
 
 _env_variables $env_var
 _the_end

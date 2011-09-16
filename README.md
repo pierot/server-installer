@@ -6,15 +6,15 @@ Basic Linode install
 ### Installs
 * rvm + ruby 1.8.7 + ruby 1.9.7 + bundler
 * rubygems
-* passenger + nginx
+* passenger (latest) + nginx
 * php-fpm
 
 ### Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.0.6' -e 'production']`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.0.6' -e 'production']`
 
 or for help and instructions
 
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/install.sh ) -h`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/base.sh ) -h`
 
 Postfix install
 ---------------
@@ -39,3 +39,9 @@ MySQL
 
 ###Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/mysql.sh ) -p 'password'`
+
+Noort.be site
+------------
+
+###Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/linode-setup/noort_be.sh )`

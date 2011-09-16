@@ -119,10 +119,8 @@ env.url http://localhost/nginx_status\n
 
   _log "***** Add nginx virtual host for munin-stats"
 
-  _create_nginx_site "stats.noort.be" "stats.noort.be s.noort.be" "/var/cache/munin/www"
-
-  sudo touch "/opt/nginx/sites-available/stats.noort.be"
-  sudo cat > "/opt/nginx/sites-available/stats.noort.be" <<EOS
+  sudo touch $nginx_dir"/sites-available/stats.noort.be"
+  sudo cat > $nginx_dir"/sites-available/stats.noort.be" <<EOS
 server {
   listen 80;
   server_name stats.noort.be s.noort.be;
@@ -146,7 +144,7 @@ server {
 }
 EOS
 
-  sudo ln -s "/opt/nginx/sites-available/stats.noort.be" "/opt/nginx/sites-enabled/stats.noort.be"
+  sudo ln -s $nginx_dir"/sites-available/stats.noort.be" $nginx_dir"/sites-enabled/stats.noort.be"
   
   _log "***** Restart nginx"
 
