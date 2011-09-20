@@ -53,7 +53,7 @@ fi
 ###############################################################################
 
 _postgresql() {
-	_log "Install postgresql"
+  _log "Install postgresql"
 
   _system_installs_install 'postgresql postgresql-contrib postgresql-client libpq-dev'
 
@@ -65,7 +65,7 @@ _postgresql() {
   _log "****** Alter postgres user"
 
   sudo -u postgres psql -c "ALTER user postgres WITH PASSWORD '$db_pass'"
-  
+
   _log "****** Restart postgresql"
 
   sudo /etc/init.d/postgresql restart
