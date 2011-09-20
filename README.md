@@ -61,6 +61,14 @@ MySQL
 ###Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/mysql.sh ) -p 'password'`
 
+PostgreSQL install
+---------------
+### Installs
+PostgreSQL
+
+###Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/postgresql.sh ) -p 'password'`
+
 Noort.be site
 ------------
 
