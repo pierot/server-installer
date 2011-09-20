@@ -44,7 +44,8 @@ _link_munin_varnish() {
   sudo git clone git://github.com/basiszwo/munin-varnish.git
 
   sudo chmod a+x /usr/share/munin/plugins/munin-varnish/varnish_*
-
+  
+  sudo rm -f /etc/munin/plugins/varnish_*
   sudo ln -s /usr/share/munin/plugins/munin-varnish/varnish_* /etc/munin/plugins/
 
   _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
@@ -65,18 +66,18 @@ _final_info() {
   _log "Configuration suggestion for /etc/default/varnish"
   _log "This will run Varnish on port 80"
 
-  _print <<EOF
-DAEMON_OPTS="-a :80 \
+  _print "
+DAEMON_OPTS=\"-a :80 \
              -T localhost:6082 \
              -f /etc/varnish/default.vcl \
              -S /etc/varnish/secret \
-             -s malloc,256m"
-EOF
+             -s malloc,256m\"
+"
 
   _log "Varnish is set up to forward all traffic to port 8000 on 127.0.0.1"
   _log "Setup your sites to listen for 127.0.0.1:8000"
 
-  _log "Files to remember: `/etc/default/varnish` and `/etc/varnish/default.vcl`"
+  _log "Files to remember: \`/etc/default/varnish\` and \`/etc/varnish/default.vcl\`"
 }
 
 _install_varnish
