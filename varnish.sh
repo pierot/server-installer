@@ -42,7 +42,7 @@ _link_munin_varnish() {
   cd /usr/share/munin/plugins
 
   if [ -d "/usr/share/munin/plugins/munin-varnish" ]; then
-    sudo -rf ./munin-varnish
+    sudo -rf /usr/share/munin/plugins/munin-varnish
   fi
 
   sudo git clone git://github.com/basiszwo/munin-varnish.git
