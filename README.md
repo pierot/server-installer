@@ -66,3 +66,11 @@ Noort.be site
 
 ###Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/noort_be.sh )`
+
+Varnish install
+---------------
+### Installs
+Varnish!
+
+###Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/varnish.sh )`
