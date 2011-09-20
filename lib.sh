@@ -40,4 +40,10 @@ _check_root() {
   fi
 }
 
+_cleanup_lib() {
+  if [ -f "~/lib.sh"]; then
+    rm ~/lib.sh
+  fi 
+}
+
 _check_root

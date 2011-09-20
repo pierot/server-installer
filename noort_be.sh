@@ -26,7 +26,7 @@ Options:
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:d: opt; do 
   case $opt in
     h)
       _usage
@@ -55,9 +55,15 @@ _setup_noort() {
 
   sudo touch $nginx_dir"/sites-available/noort.be"
   sudo cat > $nginx_dir"/sites-available/noort.be" <<EOS
+server { 
+  listen 80; 
+  server_name www.noort.be;
+  rewrite ^ http://noort.be$uri permanent;
+}
+
 server {
   listen 80;
-  server_name noort.be www.noort.be;
+  server_name noort.be;
 
   access_log /srv/logs/noort.be.access.log;
   error_log /srv/logs/noort.be.error.log;
