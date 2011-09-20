@@ -41,8 +41,11 @@ _link_munin_varnish() {
 
   cd /usr/share/munin/plugins
 
-  sudo git clone git://github.com/basiszwo/munin-varnish.git
+  if [ -d "/usr/share/munin/plugins/munin-varnish" ]; then
+    sudo -rf ./munin-varnish
+  fi
 
+  sudo git clone git://github.com/basiszwo/munin-varnish.git
   sudo chmod a+x /usr/share/munin/plugins/munin-varnish/varnish_*
   
   sudo rm -f /etc/munin/plugins/varnish_*
@@ -67,10 +70,10 @@ _final_info() {
   _log "This will run Varnish on port 80"
 
   _print "
-DAEMON_OPTS=\"-a :80 \
-             -T localhost:6082 \
-             -f /etc/varnish/default.vcl \
-             -S /etc/varnish/secret \
+DAEMON_OPTS=\"-a :80 \\\n
+             -T localhost:6082 \\\n
+             -f /etc/varnish/default.vcl \\\n
+             -S /etc/varnish/secret \\\n
              -s malloc,256m\"
 "
 
