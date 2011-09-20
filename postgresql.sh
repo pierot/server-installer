@@ -59,16 +59,18 @@ _postgresql() {
 
   _log "****** pg_hba.conf"
 
-  sudo pg_conf=$(find /etc/ -name "pg_hba.conf" | head -n 1)
-  sed -i -e  's/^.*local.*all.*all.*$/local\tall\tall\tmd5/g'  $pg_conf
+  pg_conf=$(find /etc/ -name "pg_hba.conf" | head -n 1)
+
+  sudo sed -i -e  's/^.*local.*all.*all.*$/local\tall\tall\tmd5/g' $pg_conf
 
   _log "****** Alter postgres user"
 
-  sudo -u postgres psql -c "ALTER user postgres WITH PASSWORD '$db_pass'"
+  sudo su - postgres psql -c "ALTER user postgres WITH PASSWORD '$db_pass'"
 
   _log "****** Restart postgresql"
-
   sudo /etc/init.d/postgresql restart
+
+  _log "****** Postgresql status"
   sudo /etc/init.d/postgresql status
 }
 
