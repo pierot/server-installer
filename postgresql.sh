@@ -55,7 +55,7 @@ fi
 _postgresql() {
 	_log "Install postgresql"
 
-  _system_installs_install 'postgresql postgresql-contrib postgresql-dev postgresql-client libpq-dev'
+  _system_installs_install 'postgresql postgresql-contrib postgresql-client libpq-dev'
 
   sudo pg_conf=$(find /etc/ -name "pg_hba.conf" | head -n 1)
   sed -i -e  's/^.*local.*all.*all.*$/local\tall\tall\tmd5/g'  $pg_conf
