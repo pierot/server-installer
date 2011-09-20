@@ -19,6 +19,24 @@ _install_varnish() {
 _configure_varnish() {
   _log "Configure Varnish"
 
+  sudo mv /etc/default/varnish /etc/default/varnish.bak
+
+  sudo cat > /etc/default/varnish <<EOF
+START=yes
+
+MEMLOCK=82000
+
+NFILES=\$(ulimit -n)
+
+INSTANCE=\$(uname -n)
+
+DAEMON_OPTS=\"-a :80 \\n
+             -T localhost:6082 \\n
+             -f /etc/varnish/default.vcl \\n
+             -S /etc/varnish/secret \\n
+             -s malloc,256m\"
+EOF
+
   sudo mv /etc/varnish/default.vcl /etc/varnish/default.vcl.bak
 
   sudo cat > /etc/varnish/default.vcl <<EOF
@@ -67,15 +85,6 @@ user root\n
 
 _final_info() {
   _print "
-Configuration suggestion for /etc/default/varnish.
-This will run Varnish on port 80.
-
-DAEMON_OPTS=\"-a :80 \\\n
-             -T localhost:6082 \\\n
-             -f /etc/varnish/default.vcl \\\n
-             -S /etc/varnish/secret \\\n
-             -s malloc,256m\"
-
 Varnish is set up to forward all traffic to port 8000 on 127.0.0.1
 Setup your sites to listen for 127.0.0.1:8000
 
