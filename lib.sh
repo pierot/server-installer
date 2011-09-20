@@ -41,8 +41,8 @@ _check_root() {
 }
 
 _cleanup_lib() {
-  if [ -f "~/lib.sh" ]; then
-    rm ~/lib.sh
+  if [ -f "./lib.sh" ]; then
+    rm ./lib.sh
   fi 
 }
 
