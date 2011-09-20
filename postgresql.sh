@@ -57,14 +57,19 @@ _postgresql() {
 
   _system_installs_install 'postgresql postgresql-contrib postgresql-client libpq-dev'
 
+  _log "****** pg_hba.conf"
+
   sudo pg_conf=$(find /etc/ -name "pg_hba.conf" | head -n 1)
   sed -i -e  's/^.*local.*all.*all.*$/local\tall\tall\tmd5/g'  $pg_conf
 
+  _log "****** Alter postgres user"
+
   sudo -u postgres psql -c "ALTER user postgres WITH PASSWORD '$db_pass'"
   
-  _log "Start postgresql"
+  _log "****** Restart postgresql"
 
-  sudo /etc/init.d/postgresql start
+  sudo /etc/init.d/postgresql restart
+  sudo /etc/init.d/postgresql status
 }
 
 ###############################################################################
