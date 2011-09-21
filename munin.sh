@@ -62,14 +62,14 @@ _munin() {
 
   echo -e $munin_config | sudo tee -a /etc/munin/munin.conf > /dev/null
 
-  _log "***** Add munin-node-config to /etc/munin/munin-node.conf"
-
-  munin_node_config="
-allow ^127\.0\.0\.1$\n
-host 127.0.0.1\n
-"
-
-  echo -e $munin_node_config | sudo tee -a /etc/munin/munin-node.conf > /dev/null
+#   _log "***** Add munin-node-config to /etc/munin/munin-node.conf"
+# 
+#   munin_node_config="
+# allow ^127\.0\.0\.1$\n
+# host 127.0.0.1\n
+# "
+# 
+#   echo -e $munin_node_config | sudo tee -a /etc/munin/munin-node.conf > /dev/null
 
   # Find and replace
   _log "***** Add nginx-stub-status to "$nginx_dir"/conf/nginx.conf"
