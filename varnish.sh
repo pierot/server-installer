@@ -26,15 +26,15 @@ START=yes
 
 MEMLOCK=82000
 
-NFILES=\$(ulimit -n)
+NFILES=$(ulimit -n)
 
-INSTANCE=\$(uname -n)
+INSTANCE=$(uname -n)
 
-DAEMON_OPTS=\"-a :80 \\n
-             -T localhost:6082 \\n
-             -f /etc/varnish/default.vcl \\n
-             -S /etc/varnish/secret \\n
-             -s malloc,256m\"
+DAEMON_OPTS="-a :80 \
+             -T localhost:6082 \
+             -f /etc/varnish/default.vcl \
+             -S /etc/varnish/secret \
+             -s malloc,256m"
 EOF
 
   sudo mv /etc/varnish/default.vcl /etc/varnish/default.vcl.bak
@@ -84,8 +84,7 @@ user root\n
 }
 
 _final_info() {
-  _print "
-Varnish is set up to forward all traffic to port 8000 on 127.0.0.1
+  _print "Varnish is set up to forward all traffic to port 8000 on 127.0.0.1
 Setup your sites to listen for 127.0.0.1:8000
 
 Files to remember: \`/etc/default/varnish\` and \`/etc/varnish/default.vcl\`
