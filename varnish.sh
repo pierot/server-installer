@@ -99,3 +99,4 @@ _configure_varnish
 _link_munin_varnish
 
 _final_info
+_note_installation "varnish"

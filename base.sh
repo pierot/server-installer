@@ -324,3 +324,4 @@ _setup_www
 _env_variables $env_var
 _the_end
 
+_note_installation "base"

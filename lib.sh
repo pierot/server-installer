@@ -46,4 +46,8 @@ _cleanup_lib() {
   fi 
 }
 
+_note_installation() {
+  touch "$HOME/$1-installed"
+}
+
 # _check_root
