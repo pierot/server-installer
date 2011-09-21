@@ -46,4 +46,4 @@ _cleanup_lib() {
   fi 
 }
 
-_check_root
+# _check_root

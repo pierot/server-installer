@@ -2,6 +2,8 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
+_check_root
+
 ###############################################################################
 
 nginx_dir='/opt/nginx'
