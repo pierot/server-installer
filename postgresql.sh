@@ -81,3 +81,4 @@ _postgresql() {
 ###############################################################################
 
 _postgresql
+_note_installation "postgresql"

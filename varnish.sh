@@ -25,18 +25,10 @@ _configure_varnish() {
 
   sudo cat > /etc/default/varnish <<EOF
 START=yes
-
 MEMLOCK=82000
-
 NFILES=$(ulimit -n)
-
 INSTANCE=$(uname -n)
-
-DAEMON_OPTS="-a :80 \
-             -T localhost:6082 \
-             -f /etc/varnish/default.vcl \
-             -S /etc/varnish/secret \
-             -s malloc,256m"
+DAEMON_OPTS="-a :80 -T localhost:6082 -f /etc/varnish/default.vcl -S /etc/varnish/secret -s malloc,256m"
 EOF
 
   sudo mv /etc/varnish/default.vcl /etc/varnish/default.vcl.bak
@@ -49,6 +41,10 @@ backend default {
   .connect_timeout = 1s; 
   .between_bytes_timeout = 2s; 
 } 
+
+sub vcl_recv {
+  unset req.http.cookie;
+}
 EOF
 
   sudo service varnish restart
@@ -99,3 +95,4 @@ _configure_varnish
 _link_munin_varnish
 
 _final_info
+_note_installation "varnish"

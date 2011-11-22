@@ -59,3 +59,4 @@ Connection closed by foreign host.
 _postfix_loopback_only
 
 _testing
+_note_installation "postfix"

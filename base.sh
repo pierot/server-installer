@@ -187,10 +187,17 @@ _gem_config() {
 
 	gemrc_settings="
 ---\n
+:verbose: true\n
+:bulk_threshold: 1000\n
+install: --no-ri --no-rdoc --env-shebang\n
 :sources:\n
-- http://gems.rubyforge.org\n
+- http://gemcutter.org\n
+- http://gems.rubyforge.org/\n
 - http://gems.github.com\n
-gem: --no-ri --no-rdoc\n
+:benchmark: false\n
+:backtrace: false\n
+update: --no-ri --no-rdoc --env-shebang\n
+:update_sources: true\n
 "
 
   sudo touch /etc/skel/.gemrc
@@ -324,3 +331,4 @@ _setup_www
 _env_variables $env_var
 _the_end
 
+_note_installation "base"

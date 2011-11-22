@@ -115,3 +115,4 @@ _mysql_tune() {
 ###############################################################################
 
 _mysql_install $pass && _mysql_tune 90
+_note_installation "mysql"
