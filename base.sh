@@ -254,11 +254,11 @@ _passenger_nginx() {
   nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
 
   sites_enabled_config="http {\ninclude $nginx_dir_escaped\/sites-enabled\/*;"
-  gzip_level="gzip on;\ngzip_comp_level 2;\ngzip_disable \"msie6\";"
+  gzip_config="gzip            on;\ngzip_comp_level 3;\ngzip_types      text/plain application/xml text/javascript text/css application/json application/x-javascript text/html;\ngzip_disable    \"msie6\";"
 
   _add_nginx_config "http {" "$sites_enabled_config"
 
-  _add_nginx_config "\#gzip  on;" "$gzip_level"
+  _add_nginx_config "\#gzip  on;" "$gzip_config"
 
   _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  15;"
   _add_nginx_config "worker_processes  1;" "worker_processes  3;"
