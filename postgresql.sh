@@ -65,6 +65,9 @@ _postgresql() {
 
   sudo sed -i -e  's/^.*local.*all.*all.*$/local\tall\tall\tmd5/g' $pg_conf
 
+  # Make sure linux can access through 'postgres' account
+  sudo sed -i -e  's/^local   all             postgres                                peer$/local   all             postgres                                md5/g' $pg_conf
+
   _log "***** Alter postgres user"
 
   PSQL_COMMAND="psql -c \"ALTER USER postgres WITH PASSWORD '$db_pass';\""
