@@ -2,12 +2,13 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
+_redirect_stdout 'base'
 _check_root
 
 ###############################################################################
 
 server_name=
-nginx_version="1.0.6"
+nginx_version="1.2.0"
 env_var="production"
 pass=
 nginx_dir='/opt/nginx'
@@ -17,9 +18,9 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              install.sh -h 'server_name' [-n '1.0.6' -e 'production']
+Usage:              install.sh -h 'server_name' [-n '1.2.0' -e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/install.sh ) -s 'tortuga' [-n '1.0.6' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/install.sh ) -s 'tortuga' [-n '1.2.0' -e 'production']
 
 Options:
  
@@ -91,7 +92,8 @@ _system_installs() {
   sudo aptitude -y full-upgrade
   
   _system_installs_install 'build-essential bison openssl libreadline5 libreadline-dev curl git-core zlib1g make'
-  _system_installs_install 'zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev sqlite3 libcurl4-openssl-dev gcc'
+  _system_installs_install 'zlib1g-dev libssl-dev vim libcurl4-openssl-dev gcc'
+  _system_installs_install 'libsqlite3-0 libsqlite3-dev sqlite3'
   _system_installs_install 'libreadline-dev libxslt-dev libxml2-dev subversion autoconf gettext'
   _system_installs_install 'libmagickwand-dev imagemagick'
   _system_installs_install 'chkconfig lsof'
@@ -124,7 +126,8 @@ _rvm() {
 
   _log "***** Execute install-system-wide for rvm"
 
-  sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
+  # sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
+  curl -L get.rvm.io | sudo bash -s stable
 
   _log "***** Add sourcing of rvm in ~/.bashrc"
 
@@ -132,9 +135,14 @@ _rvm() {
   search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
   rvm_bin_source="fi\n
   if groups | grep -q rvm ; then\n
-    source '/usr/local/lib/rvm'\n
+    source '/usr/local/rvm/scripts/rvm'\n
   fi\n
   "
+  # rvm_bin_source="fi\n
+  # if groups | grep -q rvm ; then\n
+  #   source '/usr/local/lib/rvm'\n
+  # fi\n
+  # "
 
   if [ -f ~/.bashrc ]; then
     sudo perl -pi -e "$search_string" ~/.bashrc 
@@ -172,10 +180,10 @@ _rvm() {
    
   rvm install 1.8.7
 
-  _log "***** Installing Ruby 1.9.2 (default)"
+  _log "***** Installing Ruby 1.9.3 (default)"
 
-  rvm install 1.9.2
-  rvm --default use 1.9.2
+  rvm install 1.9.3
+  rvm --default use 1.9.3
 }
 
 _gem_config() {
@@ -206,7 +214,7 @@ update: --no-ri --no-rdoc --env-shebang\n
   echo -e $gemrc_settings | sudo tee -a /etc/skel/.gemrc > /dev/null
   echo -e $gemrc_settings | sudo tee -a ~/.gemrc > /dev/null
 
-	# _log "***** Installing Bundler"
+	_log "***** Installing Bundler"
 
   rvm gemset use global
   

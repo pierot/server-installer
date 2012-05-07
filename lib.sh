@@ -11,6 +11,10 @@ COL_RED="\x1b[31;01m"
 temp_dir='/tmp/src'
 mkdir -p $temp_dir
 
+_redirect_stdout() {
+  exec > >(tee "log-$1.log")
+}
+
 _log() {
   _print "$1 ******************************************"
 }
@@ -49,5 +53,3 @@ _cleanup_lib() {
 _note_installation() {
   touch "$HOME/$1-installed"
 }
-
-# _check_root

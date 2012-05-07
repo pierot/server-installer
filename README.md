@@ -9,6 +9,7 @@ Library
 * _print
 * _system_installs_install
 * _check_root
+* _redirect_stdout
 
 ### Variables:
 * $temp_dir
@@ -25,13 +26,13 @@ At the top of your bash script. This way you can use all functions and variables
 Basic Linode install
 -------------------
 ### Installs
-* rvm + ruby 1.8.7 + ruby 1.9.7 + bundler
+* rvm + ruby 1.8.7 + ruby 1.9.3 + bundler
 * rubygems
 * passenger (latest) + nginx
 * php-fpm
 
 ### Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.0.6' -e 'production']`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.2.0' -e 'production']`
 
 or for help and instructions
 

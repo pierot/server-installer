@@ -2,6 +2,7 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
+_redirect_stdout 'postgresql'
 _check_root
 
 ###############################################################################
