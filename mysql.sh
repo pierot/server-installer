@@ -64,6 +64,7 @@ _mysql_install() {
   echo "mysql-server-5.1 mysql-server/root_password password $1" | debconf-set-selections
   echo "mysql-server-5.1 mysql-server/root_password_again password $1" | debconf-set-selections
 
+  _system_installs_install 'php5-mysql'
   _system_installs_install 'mysql-server mysql-client libmysqlclient15-dev libmysql-ruby'
 
 	_log "***** Sleeping while MySQL starts up for the first time..."

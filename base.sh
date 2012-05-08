@@ -292,6 +292,7 @@ _php() {
 	_log "Install PHP"
 
   _system_installs_install 'php5-fpm php5-common'
+  _system_installs_install 'php5-curl php5-gd php-pear php5-imagick php5-imap php5-mcrypt php5-sqlite'
 
   sudo /etc/init.d/php5-fpm start
 }
