@@ -162,7 +162,7 @@ _rvm() {
 
   _log "***** Now source!"
 
-  source /usr/local/lib/rvm
+  source /usr/local/rvm/scripts/rvm
 
   _log "***** Add bundler to global.gems"
 
