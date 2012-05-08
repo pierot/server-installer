@@ -99,6 +99,21 @@ _system_installs() {
   _system_installs_install 'chkconfig lsof'
 }
 
+_system_locales() {
+	_log "Fix locales"
+
+  _system_installs_install 'multipath-tools'
+
+  # Fix locales
+  export LANGUAGE=en_US.UTF-8
+  export LANG=en_US.UTF-8
+  export LC_ALL=en_US.UTF-8
+
+  locale-gen en_US.UTF-8
+
+  sudo dpkg-reconfigure locales
+}
+
 _system_timezone() {
 	_log "System timezone"
 
@@ -243,7 +258,7 @@ _passenger_nginx() {
 
   _log "***** Create global wrapper 'passenger'"
 
-  rvm wrapper 1.9.2@global passenger
+  rvm wrapper 1.9.3@global passenger
 
   _log "***** Init nginx start-up script"
 
@@ -326,6 +341,7 @@ _the_end() {
 
 _hostname $server_name
 _system_installs
+_system_locales
 _system_timezone
 _setup_users
 
