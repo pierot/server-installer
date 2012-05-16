@@ -97,6 +97,7 @@ _system_installs() {
   _system_installs_install 'libreadline-dev libxslt-dev libxml2-dev subversion autoconf gettext'
   _system_installs_install 'libmagickwand-dev imagemagick'
   _system_installs_install 'chkconfig lsof'
+  _system_installs_install 'python-setuptools'
 }
 
 _system_locales() {
@@ -280,6 +281,7 @@ _passenger_nginx() {
   gzip_config="gzip            on;\ngzip_comp_level 3;\ngzip_types      text/plain application/xml text/javascript text/css application/json application/x-javascript text/html;\ngzip_disable    \"msie6\";"
 
   _add_nginx_config "http {" "$sites_enabled_config"
+  _add_nginx_config "http {" "http {\nserver_tokens off;"
 
   _add_nginx_config "\#gzip  on;" "$gzip_config"
 
