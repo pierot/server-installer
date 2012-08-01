@@ -18,9 +18,9 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              install.sh -h 'server_name' [-n '1.2.0' -e 'production']
+Usage:              base.sh -h 'server_name' [-n '1.2.0' -e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/install.sh ) -s 'tortuga' [-n '1.2.0' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga' [-n '1.2.0' -e 'production']
 
 Options:
  

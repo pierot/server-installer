@@ -38,13 +38,73 @@ EOF
 backend default { 
   .host = "127.0.0.1"; 
   .port = "8000"; 
-  .first_byte_timeout = 5s; 
-  .connect_timeout = 1s; 
-  .between_bytes_timeout = 2s; 
+  .first_byte_timeout = 25s; 
+  .connect_timeout = 20s; 
+  .between_bytes_timeout = 30s; 
 } 
 
+acl purge {
+  "localhost";
+  "127.0.0.1";
+  "noort.be";
+}
+
 sub vcl_recv {
-  unset req.http.cookie;
+  # unset req.http.cookie;
+
+  # Insert the client's ip address into the request header
+  if (req.restarts == 0) {
+    if (req.http.x-forwarded-for) {
+      set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
+    } else {
+      set req.http.X-Forwarded-For = client.ip;
+    }
+  }
+
+  # Don't cache POST, PUT, or DELETE requests
+  if (req.request != "GET") {
+    return(pass);
+  }
+
+  # Strip cookies from static content
+  if (req.request == "GET" && req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
+    unset req.http.cookie;
+  }
+
+  if (req.request == "PURGE") {
+    if (!client.ip ~ purge) {
+      error 405 "not allowed.";
+    }
+
+    return(lookup);
+  }
+ 
+  return(lookup);
+}
+
+sub vcl_hit {
+  if (req.request == "PURGE") {
+    purge;
+
+    error 200 "Purged.";
+  }
+}
+
+sub vcl_miss {
+  if (req.request == "PURGE") {
+    purge;
+
+    error 200 "Purged.";
+  }
+}
+
+sub vcl_deliver {
+  # The below provides custom headers to indicate whether the response came from varnish cache or directly from the app.
+  if (obj.hits > 0) {
+    set resp.http.X-Varnish-Cache = "HIT";
+  } else {
+    set resp.http.X-Varnish-Cache = "MISS";
+  }
 }
 EOF
 
