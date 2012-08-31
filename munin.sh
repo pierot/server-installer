@@ -141,6 +141,9 @@ server {
   }
 
   location / {
+    # auth_basic            "Restricted";
+    # auth_basic_user_file  /srv/conf/htpasswd;
+
     root /var/cache/munin/www/;
     index  index.html index.php;
   }

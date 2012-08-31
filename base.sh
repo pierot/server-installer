@@ -137,6 +137,12 @@ _setup_users() {
   sudo sysctl -w net.ipv4.conf.default.accept_source_route=0
 }
 
+_ssh() {
+	_log "SSH Config"
+
+  sudo perl -pi -e "s/Port 22/Port 33/" "/etc/ssh/sshd_config"
+}
+
 _rvm() {
 	_log "Installing RVM System wide"
 
