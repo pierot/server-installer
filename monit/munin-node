@@ -1,0 +1,8 @@
+check process munin-node with pidfile /var/run/munin/munin-node.pid
+
+group services
+
+start program = "/etc/init.d/munin-node start"
+stop program = "/etc/init.d/munin-node stop"
+
+if 5 restarts within 5 cycles then timeout

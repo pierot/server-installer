@@ -73,6 +73,7 @@ set alert pieter@noort.be # set this to recive alerts and notifications\n
 set httpd port 2812\n
 \t# use address localhost # only accept connection from localhost\n
 \tallow localhost # allow localhost to connect to the server and\n
+\tallow 127.0.0.1 # allow localhost to connect to the server and\n
 \tallow 192.168.1.0/255.255.255.0 # allow any host on 192.168.1.* subnet\n
 \tallow admin:admin # require user 'admin' with password 'pa$$w0rd'\n
 \n\n
@@ -90,8 +91,11 @@ set logfile /var/log/monit.log\n
   sudo touch $nginx_dir"/sites-available/monit.noort.be"
   sudo cat > $nginx_dir"/sites-available/monit.noort.be" <<EOS
 server {
-  listen 80;
+  listen 127.0.0.1:8000;
   server_name monit.noort.be;
+
+  access_log /srv/logs/monit.noort.be.access.log;
+  error_log /srv/logs/monit.noort.be.error.log;
 
   location / {
     proxy_pass http://127.0.0.1:2812;
@@ -102,9 +106,13 @@ EOS
 
   sudo ln -s $nginx_dir"/sites-available/monit.noort.be" $nginx_dir"/sites-enabled/monit.noort.be"
   
-  _log "***** Restart nginx"
+  _log "***** Reload nginx"
 
   sudo /etc/init.d/nginx reload
+
+  _log "***** Restart varnish"
+
+  sudo /etc/init.d/varnish restart
 }
 
 ###############################################################################
