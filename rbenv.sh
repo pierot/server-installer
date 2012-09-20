@@ -48,9 +48,11 @@ _rbenv() {
   # Delete when exists
   rm -rf $HOME/.rbenv
 
+  _log "***** Cloning rbenv git repo"
   # Clone into
   git clone git://github.com/sstephenson/rbenv.git $HOME/.rbenv
 
+  _log "***** Install ruby-build"
   # Install Ruby-Build
   mkdir -p $HOME/.rbenv/plugins
 
@@ -60,9 +62,11 @@ _rbenv() {
 
   source $HOME/.bash_profile
 
+  _log "***** Install ruby 1.9.3-p125"
   rbenv install 1.9.3-p125
   rbenv global 1.9.3-p125
 
+  _log "***** Rbenv rehash"
   rbenv rehash
 }
 
