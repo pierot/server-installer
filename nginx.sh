@@ -2,12 +2,12 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'nginx-passenger'
+_redirect_stdout 'nginx'
 _check_root
 
 ###############################################################################
 
-nginx_version="1.2.0"
+nginx_version="1.2.3"
 nginx_dir='/opt/nginx'
 
 ###############################################################################
@@ -15,15 +15,15 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              base.sh -h [-n '1.2.0' -d '/opt/nginx']
+Usage:              base.sh -h [-n '1.2.3' -d '/opt/nginx']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) [-n '1.2.0' -d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) [-n '1.2.3' -d '/opt/nginx']
 
 Options:
  
   -h                Show this message
   -d '/opt/nginx'   Sets nginx install dir
-  -n '1.0.6'        nginx version number
+  -n '1.2.3'        nginx version number
   "
 
   exit 0
@@ -54,8 +54,8 @@ done
 
 ###############################################################################
 
-_passenger_nginx() {
-	_log "Install Passenger with nginx"
+_nginx() {
+	_log "Install nginx"
 
   _log "***** Download nginx source $1"
   
@@ -63,18 +63,12 @@ _passenger_nginx() {
   sudo wget "http://nginx.org/download/nginx-$1.tar.gz"
   sudo tar -xzvf "nginx-$1.tar.gz" > /dev/null
 
-  _log "***** Install passenger gem"
+  _log "***** Install nginx"
+  cd $temp_dir/nginx-$1
 
-  gem install passenger
-
-  _log "***** Install passenger nginx module"
-
-  # rvmsudo 
-  passenger-install-nginx-module --nginx-source-dir="$temp_dir/nginx-$1" --prefix=$nginx_dir --auto --extra-configure-flags="--with-http_stub_status_module"
-
-  _log "***** Create global wrapper 'passenger'"
-
-  rvm wrapper 1.9.3@global passenger
+  ./configure --prefix=$nginx_dir --with-http_stub_status_module --with-http_ssl_module
+  make
+  sudo make install
 
   _log "***** Init nginx start-up script"
 
@@ -139,9 +133,9 @@ _setup_www() {
 
 ###############################################################################
 
-_passenger_nginx $nginx_version
+_nginx $nginx_version
 _php
 
 _setup_www
 
-_note_installation "nginx-passenger"
+_note_installation "nginx"
