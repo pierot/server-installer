@@ -25,18 +25,30 @@ At the top of your bash script. This way you can use all functions and variables
 
 Basic Linode install
 -------------------
-### Installs
-* rvm + ruby 1.8.7 + ruby 1.9.3 + bundler
-* rubygems
-* passenger (latest) + nginx
-* php-fpm
-
 ### Usage
-`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga'  [-d '/opt/nginx' -n '1.2.0' -e 'production']`
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga'  [-e 'production']`
 
 or for help and instructions
 
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -h`
+
+RVM install
+-----------
+### Installs
+* rvm + ruby 1.8.7 + ruby 1.9.3 + bundler
+* rubygems
+
+### Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/rvm.sh )`
+
+NGINX + PASSENGER + PHP5 install
+--------------------------------
+### Installs
+* passenger (latest) + nginx
+* php-fpm
+
+### Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/nginx-passenger-php.sh ) [-d '/opt/nginx' -n '1.2.0']`
 
 Postfix install
 ---------------

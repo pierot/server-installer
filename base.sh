@@ -8,27 +8,23 @@ _check_root
 ###############################################################################
 
 server_name=
-nginx_version="1.2.0"
 env_var="production"
 pass=
-nginx_dir='/opt/nginx'
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              base.sh -h 'server_name' [-n '1.2.0' -e 'production']
+Usage:              base.sh -h 'server_name' [-e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga' [-n '1.2.0' -e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga' [-e 'production']
 
 Options:
  
   -h                Show this message
   -s 'server_name'  Set server name
-  -d '/opt/nginx'   Sets nginx install dir
   -e 'environment'  Set RACK / RAILS environment variable
-  -n '1.0.6'        nginx version number
   "
 
   exit 0
@@ -43,12 +39,6 @@ while getopts :hs:n:d:e: opt; do
       ;;
     s)
       server_name=$OPTARG
-      ;;
-    d)
-      nginx_dir=$OPTARG
-      ;;
-    n)
-      nginx_version=$OPTARG
       ;;
     e)
       env_var=$OPTARG
@@ -143,191 +133,6 @@ _ssh() {
   sudo perl -pi -e "s/Port 22/Port 33/" "/etc/ssh/sshd_config"
 }
 
-_rvm() {
-	_log "Installing RVM System wide"
-
-  _log "***** Execute install-system-wide for rvm"
-
-  # sudo su -c bash < <( curl -L https://raw.github.com/wayneeseguin/rvm/1.3.0/contrib/install-system-wide )
-  curl -L get.rvm.io | sudo bash -s stable
-
-  _log "***** Add sourcing of rvm in ~/.bashrc"
-
-  ps_string='[ -z "$PS1" ] && return'
-  search_string='s/\[ -z \"\$PS1\" \] \&\& return/if [[ -n \"\$PS1\" ]]; then/g'
-  rvm_bin_source="fi\n
-  if groups | grep -q rvm ; then\n
-    source '/usr/local/rvm/scripts/rvm'\n
-  fi\n
-  "
-  # rvm_bin_source="fi\n
-  # if groups | grep -q rvm ; then\n
-  #   source '/usr/local/lib/rvm'\n
-  # fi\n
-  # "
-
-  if [ -f ~/.bashrc ]; then
-    sudo perl -pi -e "$search_string" ~/.bashrc 
-
-    echo -e $rvm_bin_source | sudo tee -a ~/.bashrc > /dev/null
-  fi
-  
-  _log "***** Add sourcing of rvm in /etc/skel/.bashrc"
-  
-  if [ -f /etc/skel/.bashrc ]; then
-    sudo perl -pi -e "$search_string" /etc/skel/.bashrc
-  else
-    sudo sh -c "$ps_string > /etc/skel/.bashrc"
-  fi
-
-  echo -e $rvm_bin_source | sudo tee -a /etc/skel/.bashrc > /dev/null
-
-  _log "***** Now source!"
-
-  source /usr/local/rvm/scripts/rvm
-
-  _log "***** Add bundler to global.gems"
-
-  sudo sh -c 'echo "bundler" >> /usr/local/rvm/gemsets/global.gems'
-
-  _log "***** Reload shell"
-  
-  rvm reload
-
-  _log "***** Install Readline package shell"
-
-  rvm pkg install readline
-
-  _log "***** Installing Ruby 1.8.7"
-   
-  rvm install 1.8.7
-
-  _log "***** Installing Ruby 1.9.3 (default)"
-
-  rvm install 1.9.3
-  rvm --default use 1.9.3
-}
-
-_gem_config() {
-	_log "Updating Rubygems"
-
-  gem update --system
-
-	_log "***** Adding no-rdoc and no-ri rules to gemrc"
-
-	gemrc_settings="
----\n
-:verbose: true\n
-:bulk_threshold: 1000\n
-install: --no-ri --no-rdoc --env-shebang\n
-:sources:\n
-- http://gemcutter.org\n
-- http://gems.rubyforge.org/\n
-- http://gems.github.com\n
-:benchmark: false\n
-:backtrace: false\n
-update: --no-ri --no-rdoc --env-shebang\n
-:update_sources: true\n
-"
-
-  sudo touch /etc/skel/.gemrc
-  sudo touch ~/.gemrc
-
-  echo -e $gemrc_settings | sudo tee -a /etc/skel/.gemrc > /dev/null
-  echo -e $gemrc_settings | sudo tee -a ~/.gemrc > /dev/null
-
-	_log "***** Installing Bundler"
-
-  rvm gemset use global
-  
-  gem install bundler
-
-  rvm gemset clear
-}
-
-_passenger_nginx() {
-	_log "Install Passenger with nginx"
-
-  _log "***** Download nginx source $1"
-  
-  cd $temp_dir
-  sudo wget "http://nginx.org/download/nginx-$1.tar.gz"
-  sudo tar -xzvf "nginx-$1.tar.gz" > /dev/null
-
-  _log "***** Install passenger gem"
-
-  gem install passenger
-
-  _log "***** Install passenger nginx module"
-
-  # rvmsudo 
-  passenger-install-nginx-module --nginx-source-dir="$temp_dir/nginx-$1" --prefix=$nginx_dir --auto --extra-configure-flags="--with-http_stub_status_module"
-
-  _log "***** Create global wrapper 'passenger'"
-
-  rvm wrapper 1.9.3@global passenger
-
-  _log "***** Init nginx start-up script"
-
-  curl -L -s https://raw.github.com/gist/1187950/c8825bf2e9c9243201e4e0e974626501592ce81e/nginx-init-d > ~/nginx
-  sudo mv ~/nginx /etc/init.d/nginx
-  sudo chmod +x /etc/init.d/nginx
-  sudo /usr/sbin/update-rc.d -f nginx defaults
-
-  _log "***** Adding sites-folders"
-
-  sudo mkdir -p $nginx_dir"/sites-available"
-  sudo mkdir -p $nginx_dir"/sites-enabled"
-
-  _log "***** Add nginx config"
-
-  nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
-
-  sites_enabled_config="http {\ninclude $nginx_dir_escaped\/sites-enabled\/*;"
-  gzip_config="gzip            on;\ngzip_comp_level 3;\ngzip_types      text/plain application/xml text/javascript text/css application/json application/x-javascript text/html;\ngzip_disable    \"msie6\";"
-
-  _add_nginx_config "http {" "$sites_enabled_config"
-  _add_nginx_config "http {" "http {\nserver_tokens off;"
-
-  _add_nginx_config "\#gzip  on;" "$gzip_config"
-
-  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  15;"
-  _add_nginx_config "worker_processes  1;" "worker_processes  3;"
-
-  _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;"
-  _add_nginx_config "tcp_nodelay        on;" "tcp_nodelay        off;"
-
-  _add_nginx_config "listen       80;" "listen       8888;"
-  _add_nginx_config "server_name  localhost;" "\# server_name  localhost;"
-
-  _log "***** Verify nginx status"
-
-  sudo /etc/init.d/nginx start
-  sudo /etc/init.d/nginx stop
-  sudo /etc/init.d/nginx start
-}
-
-_add_nginx_config() {
-  sudo perl -pi -e "s/$1/$2/" $nginx_dir"/conf/nginx.conf"
-}
-
-_php() {
-	_log "Install PHP"
-
-  _system_installs_install 'php5-fpm php5-common'
-  _system_installs_install 'php5-curl php5-gd php-pear php5-imagick php5-imap php5-mcrypt php5-sqlite'
-
-  sudo /etc/init.d/php5-fpm start
-}
-
-_setup_www() {
-	_log "Setup www directories"
-
-  sudo mkdir -p /srv
-  sudo mkdir -p /srv/www
-  sudo mkdir -p /srv/logs
-}
-
 _env_variables() {
   sudo cat > /etc/environment <<EOF
 RAILS_ENV="$1"
@@ -337,9 +142,6 @@ EOF
 
 _the_end() {
 	_log "Finishing"
-
-  # MySQL
-  # echo "Please run mysql_secure_installation in order to configure your mysql installation"
 
   _log "***** Cleaning up"
   sudo apt-get -qq autoremove
@@ -352,14 +154,6 @@ _system_installs
 _system_locales
 _system_timezone
 _setup_users
-
-_rvm
-_gem_config
-
-_passenger_nginx $nginx_version
-_php
-
-_setup_www
 
 _env_variables $env_var
 _the_end
