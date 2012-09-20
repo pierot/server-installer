@@ -32,6 +32,15 @@ or for help and instructions
 
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -h`
 
+Rbenv install
+-----------
+### Installs
+* rbenv + ruby 1.9.3-p125 + bundler
+* rubygems
+
+### Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/rbenv.sh )`
+
 RVM install
 -----------
 ### Installs
