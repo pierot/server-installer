@@ -41,6 +41,16 @@ Rbenv install
 ### Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/rbenv.sh )`
 
+NGINX + PHP5 install
+--------------------------------
+### Installs
+* nginx
+* php-fpm
+
+### Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/nginx.sh ) [-d '/opt/nginx' -n '1.2.3']`
+
+
 RVM install
 -----------
 ### Installs
