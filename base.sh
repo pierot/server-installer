@@ -131,6 +131,7 @@ _ssh() {
 	_log "SSH Config"
 
   sudo perl -pi -e "s/Port 22/Port 33/" "/etc/ssh/sshd_config"
+  sudo perl -pi -e "s/AcceptEnv LANG LC_*//" "/etc/ssh/sshd_config"
 }
 
 _env_variables() {
