@@ -72,6 +72,8 @@ _hostname() {
   sudo sh -c "echo $short_server_name > /etc/hostname"
 	sudo sh -c "echo '127.0.0.1 $full_server_name $short_server_name localhost' >> /etc/hosts"
 	sudo hostname -F /etc/hostname
+
+  sudo perl -pi -e "s/SET_HOSTNAME=\'yes\'/#SET_HOSTNAME=\'yes\'/" "/etc/default/dhcpcd"
 }
 
 _system_installs() {
