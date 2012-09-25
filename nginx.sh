@@ -15,9 +15,9 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              base.sh -h [-n '1.2.3' -d '/opt/nginx']
+Usage:              node.sh -h [-n '1.2.3' -d '/opt/nginx']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) [-n '1.2.3' -d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/node.sh ) [-n '1.2.3' -d '/opt/nginx']
 
 Options:
  
