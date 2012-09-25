@@ -16,15 +16,15 @@ pass=
 _usage() {
   _print "
 
-Usage:              base.sh -h 'server_name' [-e 'production']
+Usage:              base.sh -h 'server_name.com' [-e 'production']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'tortuga' [-e 'production']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'noort.be' [-e 'production']
 
 Options:
  
-  -h                Show this message
-  -s 'server_name'  Set server name
-  -e 'environment'  Set RACK / RAILS environment variable
+  -h                    Show this message
+  -s 'server_name.com'  Set server name
+  -e 'environment'      Set RACK / RAILS environment variable
   "
 
   exit 0
@@ -54,7 +54,7 @@ while getopts :hs:n:d:e: opt; do
 done
 
 if [ -z $server_name ]; then
-  _error "-s 'server_name' not given."
+  _error "-s 'server_name.com' not given."
 
   exit 0
 fi
@@ -66,8 +66,11 @@ _hostname() {
 
 	_log "Setting hostname to $1"
 
-  sudo sh -c "echo $1 > /etc/hostname"
-	sudo sh -c "echo '127.0.0.1 $1.local $1 localhost' >> /etc/hosts"
+  full_server_name=$1
+	short_server_name=`echo $full_server_name | awk -F. '{ print $1 }'`
+
+  sudo sh -c "echo $short_server_name > /etc/hostname"
+	sudo sh -c "echo '127.0.0.1 $full_server_name $short_server_name localhost' >> /etc/hosts"
 	sudo hostname -F /etc/hostname
 }
 
@@ -135,10 +138,18 @@ _ssh() {
 }
 
 _env_variables() {
+	_log "Setting ENV variables"
+
   sudo cat > /etc/environment <<EOF
 RAILS_ENV="$1"
 RACK_ENV="$1"
 EOF
+}
+
+_install_tmux() {
+	_log "Installing tmux"
+
+  _system_installs_install 'tmux'
 }
 
 _the_end() {
@@ -155,6 +166,8 @@ _system_installs
 _system_locales
 _system_timezone
 _setup_users
+
+_install_tmux
 
 _env_variables $env_var
 _the_end
