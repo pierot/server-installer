@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
 
-wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
-
-_redirect_stdout 'node'
-_check_root
+install_name='node'
 
 ###############################################################################
 
-install_name='node'
-node_version="1.2.3"
+wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
+
+_redirect_stdout $install_name
+_check_root
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              $install_name.sh -h [-n '1.2.3']
+Usage:              $install_name.sh -h
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [-n '1.2.3']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh )
 
 Options:
  
   -h                Show this message
-  -n '1.2.3'        node version number
   "
 
   exit 0
@@ -34,9 +32,6 @@ while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
-      ;;
-    n)
-      node_version=$OPTARG
       ;;
     *)
       _error "Invalid option received"
@@ -60,7 +55,7 @@ _node() {
   cd $temp_dir
 
   _log "***** Clone node"
-  git clone git://github.com/ry/node.git
+  git clone git://github.com/joyent/node.git
   cd node
 
   _log "***** Configure & make & make install"
