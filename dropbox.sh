@@ -98,7 +98,6 @@ _dropbox_selective() {
 	_log "Selective sync $install_name"
 
 	if [ -z "$1" && -d "$HOME/.dropbox-utils" ]; then
-
     service dropbox status
     service dropbox start
 
