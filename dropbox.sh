@@ -77,7 +77,9 @@ _dropbox_manage() {
 
   _log "***** Download dropbox init script"
 
-  wget -O ./dropbox.init.sh "https://raw.github.com/gist/3787880/2e3c1cfe2e62fd53ed735ea1c6179647bef85c1a/dropbix.init.sh"
+  wget -O ./dropbox.init.sh "http://raw.github.com/gist/3787880/2e3c1cfe2e62fd53ed735ea1c6179647bef85c1a/dropbix.init.sh"
+
+  sudo perl -pi -e "s/__users__/root/" "$HOME/.dropbox-utils/dropbox.init.sh"
 
   _log "***** Create dropbox init script"
 
