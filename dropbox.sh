@@ -8,7 +8,6 @@ dir_list=''
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
 _redirect_stdout $install_name
-_check_root
 
 ###############################################################################
 
@@ -79,7 +78,7 @@ _dropbox_manage() {
 
   wget -O ./dropbox.init.sh "http://raw.github.com/gist/3787880/2e3c1cfe2e62fd53ed735ea1c6179647bef85c1a/dropbix.init.sh"
 
-  sudo perl -pi -e "s/__users__/root/" "$HOME/.dropbox-utils/dropbox.init.sh"
+  perl -pi -e "s/__users__/root/" "$HOME/.dropbox-utils/dropbox.init.sh"
 
   _log "***** Create dropbox init script"
 
@@ -89,8 +88,8 @@ _dropbox_manage() {
 
   _log "***** Test dropbox init script"
 
-  sudo service dropbox status
-  sudo service dropbox start
+  service dropbox status
+  service dropbox start
 
   _note_installation "$install_name-two"
 }
@@ -100,8 +99,8 @@ _dropbox_selective() {
 
 	if [ -z "$1" && -d "$HOME/.dropbox-utils" ]; then
 
-    sudo service dropbox status
-    sudo service dropbox start
+    service dropbox status
+    service dropbox start
 
     cd $HOME/.dropbox-utils
 
