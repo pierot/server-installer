@@ -59,9 +59,9 @@ _dropbox() {
 
   wget -O - "http://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 
-  $HOME/.dropbox-dist/dropboxd
-
   _note_installation "$install_name-one"
+
+  $HOME/.dropbox-dist/dropboxd
 }
 
 _dropbox_manage() {
