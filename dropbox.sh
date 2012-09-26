@@ -15,9 +15,9 @@ _check_root
 _usage() {
   _print "
 
-Usage:              $install_name.sh -h [ -s 'DirName', 'Dirname2' ]
+Usage:              $install_name.sh -h [ -s 'DirName, Dir\ Name' ]
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [ -s 'DirName', 'Dirname2' ] 
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [ -s 'DirName, Dir\ Name' ] 
 
 Options:
  
@@ -35,7 +35,7 @@ while getopts :hs:n:d:e: opt; do
     h)
       _usage
       ;;
-    d)
+    s)
       dir_list=$OPTARG
       ;;
     *)
