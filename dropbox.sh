@@ -98,7 +98,7 @@ _dropbox_manage() {
 _dropbox_selective() {
 	_log "Selective sync $install_name"
 
-	if [ -z "$1" ]; then
+	if [ -z "$1" && -d "$HOME/.dropbox-utils" ]; then
 
     sudo service dropbox status
     sudo service dropbox start
