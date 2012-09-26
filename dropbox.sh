@@ -121,10 +121,10 @@ _dropbox_selective() {
 
 _dropbox
 
-if [ -f "$HOME/$install_name-one" ]; then
+if [ -f "$HOME/$install_name-one-installed" ]; then
   _dropbox_manage
 fi
 
-if [ -f "$HOME/$install_name-two" ]; then
+if [ -f "$HOME/$install_name-two-installed" ]; then
   _dropbox_selective $dir_list
 fi
