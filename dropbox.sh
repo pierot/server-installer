@@ -3,6 +3,8 @@
 install_name='dropbox'
 dir_list=''
 
+# https://www.dropbox.com/install?os=lnx
+
 ###############################################################################
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh

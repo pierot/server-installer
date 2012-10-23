@@ -139,6 +139,23 @@ _ssh() {
   sudo perl -pi -e "s/AcceptEnv LANG LC_*//" "/etc/ssh/sshd_config"
 }
 
+_firewall() {
+  # open these ports
+  iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 33 -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+  iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+
+  # local traffic
+  iptables -A INPUT -i lo -j ACCEPT
+
+  # block all ports
+  iptables -A INPUT -j DROP
+
+  # local traffic
+  iptables -A OUTPUT -o lo -j ACCEPT
+}
+
 _env_variables() {
 	_log "Setting ENV variables"
 
@@ -167,6 +184,8 @@ _hostname $server_name
 _system_installs
 _system_locales
 _system_timezone
+_ssh
+_firewall
 _setup_users
 
 _install_tmux
