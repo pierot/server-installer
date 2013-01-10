@@ -113,6 +113,8 @@ _system_locales() {
 _system_timezone() {
 	_log "System timezone"
 
+  sudo dpkg-reconfigure tzdata
+
   sudo cp /usr/share/zoneinfo/Europe/Brussels /etc/localtime
 
   _system_installs_install 'ntp'
@@ -130,6 +132,10 @@ _setup_users() {
   # Do not permit source routing of incoming packets
   sudo sysctl -w net.ipv4.conf.all.accept_source_route=0
   sudo sysctl -w net.ipv4.conf.default.accept_source_route=0
+
+  # TODO
+  # adduser pierot
+  # usermod -a -G sudo pierot
 }
 
 _ssh() {
@@ -154,6 +160,20 @@ _firewall() {
 
   # local traffic
   iptables -A OUTPUT -o lo -j ACCEPT
+}
+
+_failtoban() {
+	_log "Install Fail2Ban"
+
+  _system_installs_install 'fail2ban'
+
+  sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+
+  sudo perl -pi -e "s/[33-ddos]\n\n enabled  = false\nport     = 33/[33-ddos]\n\n enabled  = true\nport     = 33/" "/etc/fail2ban/jail.local"
+  # Set "enabled" to "true" in [ssh-ddos] section
+  # Set "port" to "44444" in [ssh] and [ssh-ddos] sections
+
+  sudo service fail2ban restart
 }
 
 _env_variables() {
