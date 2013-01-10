@@ -114,3 +114,11 @@ Varnish!
 
 ###Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/varnish.sh )`
+
+Mosh install
+---------------
+### Installs
+mosh
+
+###Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/mosh.sh )`
