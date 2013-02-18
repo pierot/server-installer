@@ -202,11 +202,11 @@ _the_end() {
 
 _hostname $server_name
 _system_installs
-_system_locales
-_system_timezone
-_ssh
-_firewall
-_setup_users
+# _system_locales
+# _system_timezone
+# _ssh
+# _firewall
+# _setup_users
 
 _install_tmux
 
