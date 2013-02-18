@@ -7,7 +7,7 @@ _check_root
 
 ###############################################################################
 
-nginx_version="1.2.0"
+nginx_version="1.2.7"
 nginx_dir='/opt/nginx'
 
 ###############################################################################
@@ -15,9 +15,9 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              base.sh -h [-n '1.2.0' -d '/opt/nginx']
+Usage:              base.sh -h [-n '1.2.7' -d '/opt/nginx']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) [-n '1.2.0' -d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) [-n '1.2.7' -d '/opt/nginx']
 
 Options:
  
