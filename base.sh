@@ -93,6 +93,7 @@ _system_installs() {
   _system_installs_install 'libmagickwand-dev imagemagick'
   _system_installs_install 'chkconfig lsof'
   _system_installs_install 'python-setuptools'
+  _system_installs_install 'zsh'
 }
 
 _system_locales() {
