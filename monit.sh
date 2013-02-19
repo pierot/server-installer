@@ -64,7 +64,7 @@ _monit() {
   monit_config="\n
 # setup\n
 set mailserver smtp.gmail.com port 587 # if you want to use Gmail/Google app mail as a sender\n
-\tusername \"pieter@noort.be\" password \"haha\"\n
+\tusername \"pieter.michels@gmail.com\" password \"haha\"\n
 \tusing tlsv1\n
 \twith timeout 30 seconds\n
 \n\n
@@ -91,7 +91,7 @@ set logfile /var/log/monit.log\n
   sudo touch $nginx_dir"/sites-available/monit.noort.be"
   sudo cat > $nginx_dir"/sites-available/monit.noort.be" <<EOS
 server {
-  listen 127.0.0.1:8000;
+  listen 80;
   server_name monit.noort.be;
 
   access_log /srv/logs/monit.noort.be.access.log;
@@ -110,9 +110,9 @@ EOS
 
   sudo /etc/init.d/nginx reload
 
-  _log "***** Restart varnish"
+  # _log "***** Restart varnish"
 
-  sudo /etc/init.d/varnish restart
+  # sudo /etc/init.d/varnish restart
 }
 
 ###############################################################################

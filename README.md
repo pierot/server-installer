@@ -122,3 +122,11 @@ mosh
 
 ###Usage
 `bash <( curl -s https://raw.github.com/pierot/server-installer/master/mosh.sh )`
+
+Monit install
+---------------
+### Installs
+monit
+
+###Usage
+`bash <( curl -s https://raw.github.com/pierot/server-installer/master/monit.sh )` -n 'tortuga'
