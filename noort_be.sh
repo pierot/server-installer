@@ -85,7 +85,37 @@ EOS
   sudo /etc/init.d/nginx reload
 }
 
+_setup_site() {
+	_log "Setup $1"
+
+  sudo mkdir -p "/srv/www/$1/public"
+
+  sudo touch $nginx_dir"/sites-available/$1"
+  sudo cat > $nginx_dir"/sites-available/$1" <<EOS
+server {
+  listen 80;
+  server_name $1;
+
+  access_log /srv/logs/$1.access.log;
+  error_log /srv/logs/$1.error.log;
+
+  location / {
+    root /srv/www/$1/public/;
+    index  index.html index.php;
+  }
+}
+EOS
+
+  sudo ln -s $nginx_dir"/sites-available/$1" $nginx_dir"/sites-enabled/$1"
+  
+  _log "***** Restart nginx"
+
+  sudo /etc/init.d/nginx reload
+}
+
 ###############################################################################
 
 _setup_noort
+_setup_site 'dev.noort.be'
+
 _note_installation "noort_be"

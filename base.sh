@@ -123,8 +123,8 @@ _system_timezone() {
   sudo ntpdate ntp.ubuntu.com
 }
 
-_setup_users() {
-	_log "Setup user settings + security"
+_setup_security() {
+	_log "Setup security"
 
   _log "***** Secure shared memory"
 
@@ -133,10 +133,6 @@ _setup_users() {
   # Do not permit source routing of incoming packets
   sudo sysctl -w net.ipv4.conf.all.accept_source_route=0
   sudo sysctl -w net.ipv4.conf.default.accept_source_route=0
-
-  # TODO
-  # adduser pierot
-  # usermod -a -G sudo pierot
 }
 
 _ssh() {
@@ -147,17 +143,34 @@ _ssh() {
 }
 
 _firewall() {
+  # iptables-save > /root/firewall.rules
+  # iptables-restore < /root/firewall.rules
+
+  # clear all
+  iptables -F
+  iptables -X
+  iptables -t nat -F
+  iptables -t nat -X
+  iptables -t mangle -F
+  iptables -t mangle -X
+  iptables -P INPUT ACCEPT
+  iptables -P OUTPUT ACCEPT
+  iptables -P FORWARD ACCEPT
+
   # open these ports
   iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
   iptables -A INPUT -p tcp -m tcp --dport 33 -j ACCEPT
   iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
   iptables -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
 
-  # local traffic
-  iptables -A INPUT -i lo -j ACCEPT
+  # mosh
+  iptables -I INPUT -p udp --dport 60000:61000 -j ACCEPT
 
   # block all ports
   iptables -A INPUT -j DROP
+
+  # local traffic
+  iptables -A INPUT -i lo -j ACCEPT
 
   # local traffic
   iptables -A OUTPUT -o lo -j ACCEPT
@@ -204,10 +217,11 @@ _the_end() {
 _hostname $server_name
 _system_installs
 # _system_locales
-# _system_timezone
-# _ssh
-# _firewall
-# _setup_users
+_system_timezone
+_ssh
+_firewall
+# _failtoban
+_setup_security
 
 _install_tmux
 
