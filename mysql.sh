@@ -61,11 +61,12 @@ _mysql_install() {
     return 1;
   fi
 
-  echo "mysql-server-5.1 mysql-server/root_password password $1" | debconf-set-selections
-  echo "mysql-server-5.1 mysql-server/root_password_again password $1" | debconf-set-selections
+  echo "mysql-server-5.5 mysql-server/root_password password $1" | sudo debconf-set-selections
+  echo "mysql-server-5.5 mysql-server/root_password_again password $1" | sudo debconf-set-selections
 
   _system_installs_install 'php5-mysql'
-  _system_installs_install 'mysql-server mysql-client libmysqlclient15-dev libmysql-ruby'
+  _system_installs_install 'mysql-server mysql-client'
+  _system_installs_install 'libmysqlclient15-dev libmysql-ruby'
 
 	_log "***** Sleeping while MySQL starts up for the first time..."
 
@@ -116,5 +117,7 @@ _mysql_tune() {
 
 ###############################################################################
 
-_mysql_install $pass && _mysql_tune 90
+_mysql_install $pass
+_mysql_tune 40
+
 _note_installation "mysql"

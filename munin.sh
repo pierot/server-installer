@@ -53,7 +53,7 @@ _munin() {
   # https://github.com/jnstq/munin-nginx-ubuntu
   _log "Install Munin"
 
-  _system_installs_install 'munin munin-node'
+  _system_installs_install 'munin munin-node spawn-fcgi'
 
   _log "***** Add munin-config to /etc/munin/munin.conf"
 
@@ -64,6 +64,11 @@ _munin() {
 "
 
   echo -e $munin_config | sudo tee -a /etc/munin/munin.conf > /dev/null
+
+  _log "***** Add strategies to /etc/munin/munin-node.conf"
+
+  sudo perl -pi -e "s/#html_strategy cgi/html_strategy cgi/" "/etc/munin/munin.conf"
+  sudo perl -pi -e "s/#graph_strategy cgi/graph_strategy cgi/" "/etc/munin/munin.conf"
 
 #   _log "***** Add munin-node-config to /etc/munin/munin-node.conf"
 # 
@@ -92,44 +97,29 @@ _munin() {
 
   sudo perl -pi -e "$search_string" $nginx_dir"/conf/nginx.conf"
   
-  _log "***** Add munin plugins for requests, status and memory"
-
-  cd /usr/share/munin/plugins
-  sudo wget -q -O nginx_request http://exchange.munin-monitoring.org/plugins/nginx_request/version/2/download
-  sudo wget -q -O nginx_status http://exchange.munin-monitoring.org/plugins/nginx_status/version/3/download
-  sudo wget -q -O nginx_memory http://exchange.munin-monitoring.org/plugins/nginx_memory/version/1/download  
-
-  sudo chmod +x nginx_request
-  sudo chmod +x nginx_status
-  sudo chmod +x nginx_memory    
-
-  sudo ln -s /usr/share/munin/plugins/nginx_request /etc/munin/plugins/nginx_request
-  sudo ln -s /usr/share/munin/plugins/nginx_status /etc/munin/plugins/nginx_status
-  sudo ln -s /usr/share/munin/plugins/nginx_memory /etc/munin/plugins/nginx_memory     
-
-  _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
- 
-  munin_env="\n
-[nginx*]\n
-env.url http://localhost/nginx_status\n
-"
-
-  echo -e $munin_env | sudo tee -a /etc/munin/plugin-conf.d/munin-node > /dev/null
-  
   _log "***** Restart munin"
 
   sudo service munin-node restart
+
+  _log "***** Setup permissions for log files"
+
+  sudo chmod 0777 /var/log/munin/*.log
+
+  _log "***** Configure graphing cgi-bins"
+
+  spawn-fcgi -s /var/run/munin/fastcgi-html.sock -U nobody -u munin -g munin /usr/lib/cgi-bin/munin-cgi-html
+  spawn-fcgi -s /var/run/munin/fastcgi-graph.sock -U nobody -u munin -g munin /usr/lib/cgi-bin/munin-cgi-graph
 
   _log "***** Add nginx virtual host for munin-stats"
 
   sudo touch $nginx_dir"/sites-available/stats.noort.be"
   sudo cat > $nginx_dir"/sites-available/stats.noort.be" <<EOS
 server {
-  listen 80;
-  server_name stats.noort.be s.noort.be;
+  listen        80;
+  server_name   stats.noort.be;
 
-  access_log /srv/logs/stats.noort.be.access.log;
-  error_log /srv/logs/stats.noort.be.error.log;
+  access_log    /srv/logs/stats.noort.be.access.log;
+  error_log     /srv/logs/stats.noort.be.error.log;
 
   # pass the PHP scripts to FastCGI server
   location ~ \.php$ {
@@ -144,8 +134,27 @@ server {
     # auth_basic            "Restricted";
     # auth_basic_user_file  /srv/conf/htpasswd;
 
-    root /var/cache/munin/www/;
-    index  index.html index.php;
+    root          /var/cache/munin/www/;
+    index         index.html index.php;
+  }
+
+  location ^~ /cgi-bin/munin-cgi-graph/ {
+    access_log    off;
+    fastcgi_split_path_info ^(/cgi-bin/munin-cgi-graph)(.*);
+    fastcgi_param PATH_INFO \$fastcgi_path_info;
+    fastcgi_pass  unix:/var/run/munin/fastcgi-graph.sock;
+    include       fastcgi_params;
+  }
+
+  location /munin/static/ {
+    alias         /etc/munin/static/;
+  }
+
+  location /munin/ {
+    fastcgi_split_path_info ^(/munin)(.*);
+    fastcgi_param PATH_INFO \$fastcgi_path_info;
+    fastcgi_pass  unix:/var/run/munin/fastcgi-html.sock;
+    include       fastcgi_params;
   }
 }
 EOS
@@ -157,7 +166,36 @@ EOS
   sudo /etc/init.d/nginx reload
 }
 
+_munin_ngxin_plugins() {
+  _log "***** Add munin plugins for requests, status and memory"
+
+  cd /usr/share/munin/plugins
+  sudo wget -O nginx_request https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_request
+  sudo wget -O nginx_status https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_status
+  sudo wget -O nginx_memory https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_memory 
+
+  sudo chmod +x nginx_request
+  sudo chmod +x nginx_status
+  sudo chmod +x nginx_memory    
+
+  sudo ln -s /usr/share/munin/plugins/nginx_request /etc/munin/plugins/nginx_request
+  sudo ln -s /usr/share/munin/plugins/nginx_status /etc/munin/plugins/nginx_status
+  sudo ln -s /usr/share/munin/plugins/nginx_memory /etc/munin/plugins/nginx_memory
+
+  _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
+ 
+  munin_env="\n
+[nginx*]\n
+env.url http://localhost/nginx_status\n
+"
+
+  echo -e $munin_env | sudo tee -a /etc/munin/plugin-conf.d/munin-node > /dev/null
+  
+}
+
 ###############################################################################
 
 _munin
+# _munin_ngxin_plugins
+
 _note_installation "munin"

@@ -305,7 +305,7 @@ _system_installs
 _system_timezone
 _ssh
 _firewall
-# _failtoban
+_failtoban
 _setup_security
 
 _install_tmux

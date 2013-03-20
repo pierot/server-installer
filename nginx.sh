@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
+install_name='nginx'
+
+###############################################################################
+
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'nginx'
+_redirect_stdout $install_name
 _check_root
 
 ###############################################################################
@@ -15,15 +19,15 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              node.sh -h [-n '1.2.7' -d '/opt/nginx']
+Usage:              $install_name -h [-n '$nginx_version' -d '$nginx_dir']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/node.sh ) [-n '1.2.7' -d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [-n '$nginx_version' -d '$nginx_dir']
 
 Options:
  
   -h                Show this message
-  -d '/opt/nginx'   Sets nginx install dir
-  -n '1.2.3'        nginx version number
+  -d '$nginx_dir'   Sets nginx install dir
+  -n '$nginx_version'        nginx version number
   "
 
   exit 0
@@ -55,22 +59,22 @@ done
 ###############################################################################
 
 _nginx() {
-	_log "Install nginx"
+	_log "Install $install_name"
 
-  _log "***** Download nginx source $1"
+  _log "***** Download $install_name source $1"
   
   cd $temp_dir
   sudo wget "http://nginx.org/download/nginx-$1.tar.gz"
   sudo tar -xzvf "nginx-$1.tar.gz" > /dev/null
 
-  _log "***** Install nginx"
+  _log "***** Install $install_name"
   cd $temp_dir/nginx-$1
 
   ./configure --prefix=$nginx_dir --with-http_stub_status_module --with-http_ssl_module
   make
   sudo make install
 
-  _log "***** Init nginx start-up script"
+  _log "***** Init $install_name start-up script"
 
   curl -L -s https://raw.github.com/gist/1187950/c8825bf2e9c9243201e4e0e974626501592ce81e/nginx-init-d > ~/nginx
   sudo mv ~/nginx /etc/init.d/nginx
@@ -100,8 +104,8 @@ _nginx() {
   _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;"
   _add_nginx_config "tcp_nodelay        on;" "tcp_nodelay        off;"
 
-  _add_nginx_config "listen       80;" "listen       8888;"
-  _add_nginx_config "server_name  localhost;" "\# server_name  localhost;"
+  # _add_nginx_config "listen       80;" "listen       8888;"
+  # _add_nginx_config "server_name  localhost;" "\# server_name  localhost;"
 
   _log "***** Verify nginx status"
 
@@ -138,4 +142,4 @@ _php
 
 _setup_www
 
-_note_installation "nginx"
+_note_installation $install_name
