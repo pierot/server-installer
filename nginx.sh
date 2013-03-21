@@ -98,8 +98,9 @@ _nginx() {
 
   _add_nginx_config "\#gzip  on;" "$gzip_config"
 
-  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  15;"
+  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  10;"
   _add_nginx_config "worker_processes  1;" "worker_processes  3;"
+  _add_nginx_config "worker_connections  1024;" "worker_connections  10240;"
 
   _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;"
   _add_nginx_config "tcp_nodelay        on;" "tcp_nodelay        off;"
@@ -112,6 +113,8 @@ _nginx() {
   sudo /etc/init.d/nginx start
   sudo /etc/init.d/nginx stop
   sudo /etc/init.d/nginx start
+
+  _log "!!!!! Do check the gzip settings:\n$gzip_config"
 }
 
 _add_nginx_config() {
