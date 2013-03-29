@@ -62,4 +62,4 @@ _node() {
 
 ###############################################################################
 
-_note_installation $install_name
+_node $install_name
