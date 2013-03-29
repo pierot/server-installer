@@ -98,15 +98,12 @@ _nginx() {
 
   _add_nginx_config "\#gzip  on;" "$gzip_config"
 
-  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout  10;"
+  _add_nginx_config "keepalive_timeout  65;" "keepalive_timeout 10;\nsend_timeout 10;"
   _add_nginx_config "worker_processes  1;" "worker_processes  3;"
-  _add_nginx_config "worker_connections  1024;" "worker_connections  10240;"
+  _add_nginx_config "worker_connections  1024;" "worker_connections  15240;"
+  _add_nginx_config "events {" "events{\n\t use epoll;"
 
-  _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;"
-  _add_nginx_config "tcp_nodelay        on;" "tcp_nodelay        off;"
-
-  # _add_nginx_config "listen       80;" "listen       8888;"
-  # _add_nginx_config "server_name  localhost;" "\# server_name  localhost;"
+  _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;\ntcp_nodelay        on;"
 
   _log "***** Verify nginx status"
 
@@ -125,7 +122,7 @@ _php() {
 	_log "Install PHP"
 
   _system_installs_install 'php5-fpm php5-common'
-  _system_installs_install 'php5-curl php5-gd php-pear php5-imagick php5-imap php5-mcrypt php5-sqlite'
+  _system_installs_install 'php5-curl php5-gd php-pear php5-imagick php5-imap php5-mcrypt php5-sqlite php5-intl'
 
   sudo /etc/init.d/php5-fpm start
 }

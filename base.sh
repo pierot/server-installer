@@ -96,6 +96,19 @@ _system_installs() {
   _system_installs_install 'zsh'
 }
 
+_system_auto_update() {
+	_log "Install auto periodic update"
+
+	_system_installs_install "unattended-upgrades"
+
+  sudo cat > /etc/apt/apt.conf.d/10periodic <<EOF
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::AutocleanInterval "7";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+}
+
 _system_locales() {
 	_log "Fix locales"
 
@@ -203,6 +216,9 @@ _ssh() {
 
   sudo perl -pi -e "s/Port 22/Port 33/" "/etc/ssh/sshd_config"
   sudo perl -pi -e "s/AcceptEnv LANG LC_*//" "/etc/ssh/sshd_config"
+
+  echo "\nUseDNS no" >> /etc/ssh/sshd_config
+  echo "\nCompression yes" >> /etc/ssh/sshd_config
 }
 
 _firewall() {
@@ -266,10 +282,7 @@ _failtoban() {
 
   sudo perl -0 -pwe -i "s/\[ssh-ddos\]\n\nenabled  = false\nport     = ssh/\[ssh-ddos\]\n\nenabled  = true\nport     = 33/" "/etc/fail2ban/jail.local"
   sudo perl -0 -pwe -i "s/\[ssh\]\n\nenabled  = true\nport     = ssh/\[ssh\]\n\nenabled  = true\nport     = 33/" "/etc/fail2ban/jail.local"
-
   sudo perl -0 -pwe -i "s/destemail = root@localhost/destemail = pieter@noort.be/" "/etc/fail2ban/jail.local"
-  sudo perl -0 -pwe -i "s/destemail = root@localhost/destemail = pieter@noort.be/" "/etc/fail2ban/jail.local"
-
   sudo perl -0 -pwe -i "s/ignoreip = 127.0.0.1\/8\nbantime  = 600\nmaxretry = 3/ignoreip = 127.0.0.1\/8\nbantime  = 3600\nmaxretry = 2/" "/etc/fail2ban/jail.local"
 
   sudo service fail2ban restart

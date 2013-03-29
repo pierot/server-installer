@@ -52,20 +52,14 @@ _node() {
 
   _system_installs_install 'g++ curl libssl-dev apache2-utils'
 
-  cd $temp_dir
+  _system_installs_install 'python-software-properties python make'
 
-  _log "***** Clone node"
-  git clone git://github.com/joyent/node.git
-  cd node
+  sudo add-apt-repository ppa:chris-lea/node.js
+  sudo apt-get -qq update
 
-  _log "***** Configure & make & make install"
-  ./configure
-  make
-  sudo make install
+  _system_installs_install 'nodejs'
 }
 
 ###############################################################################
-
-_node $nginx_version
 
 _note_installation $install_name
