@@ -50,9 +50,9 @@ _node() {
 
   _log "***** Install dependencies"
 
-  _system_installs_install 'g++ curl libssl-dev apache2-utils'
+  _system_installs_install 'g++ curl libssl-dev apache2-utils python make'
 
-  _system_installs_install 'python-software-properties python make'
+  _system_installs_install 'python-software-properties software-properties-common'
 
   sudo add-apt-repository ppa:chris-lea/node.js
   sudo apt-get -qq update
