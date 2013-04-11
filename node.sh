@@ -54,7 +54,7 @@ _node() {
 
   _system_installs_install 'python-software-properties software-properties-common'
 
-  sudo add-apt-repository ppa:chris-lea/node.js
+  sudo add-apt-repository -y ppa:chris-lea/node.js
   sudo apt-get -qq update
 
   _system_installs_install 'nodejs'
