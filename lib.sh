@@ -6,6 +6,8 @@ export DEBIAN_FRONTEND=noninteractive
 COL_BLUE="\x1b[34;01m"
 COL_RESET="\x1b[39;49;00m"
 COL_RED="\x1b[31;01m"
+COL_YELLOW="\x1b[33;01m"
+COL_GRAY="\x1b[0;37m"
 
 # TEMP DIR FOR INSTALLS
 temp_dir='/tmp/src'
@@ -15,12 +17,16 @@ _redirect_stdout() {
   exec > >(tee "log-$1.log")
 }
 
-_log() {
-  _print "$1 ******************************************"
+_print_h1() {
+  printf $COL_BLUE"\n▽ $1\n"$COL_RESET
+}
+
+_print_h2() {
+  printf $COL_YELLOW"\n× $1\n"$COL_RESET
 }
 
 _print() {
-  printf $COL_BLUE"\n$1\n"$COL_RESET
+  printf $COL_GRAY"\n$1\n"$COL_RESET
 }
 
 _error() {
@@ -30,7 +36,7 @@ _error() {
 _system_installs_install() {
 	[[ -z "$1" ]] && return 1
 
-  _log "***** Install $1"
+  _print_h2 "Install $1"
 
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qq -y -f install $1
 }
@@ -47,7 +53,7 @@ _check_root() {
 _cleanup_lib() {
   if [ -f "./lib.sh" ]; then
     rm ./lib.sh
-  fi 
+  fi
 }
 
 _note_installation() {
