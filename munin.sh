@@ -2,34 +2,38 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'munin'
-_check_root
+###############################################################################
+
+install_name='munin'
+nginx_dir='/opt/nginx'
 
 ###############################################################################
 
-nginx_dir='/opt/nginx'
+_redirect_stdout $install_name
+_check_root
+_print_h1 $install_name
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              munin.sh -d ['/opt/nginx']
+Usage:              $install_name -d ['/opt/nginx']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/munin.sh ) [-d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name ) [-d '/opt/nginx']
 
 Options:
- 
+
   -h                Show this message
   -d '/opt/nginx'   Sets nginx install dir
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -44,18 +48,16 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 _munin() {
   # https://github.com/jnstq/munin-nginx-ubuntu
-  _log "Install Munin"
-
   _system_installs_install 'munin munin-node spawn-fcgi'
 
-  _log "***** Add munin-config to /etc/munin/munin.conf"
+  _print_h2 "Add munin-config to /etc/munin/munin.conf"
 
   munin_config="\n
 [noort.be]\n
@@ -65,28 +67,28 @@ _munin() {
 
   echo -e $munin_config | sudo tee -a /etc/munin/munin.conf > /dev/null
 
-  _log "***** Add strategies to /etc/munin/munin-node.conf"
+  _print "Add strategies to /etc/munin/munin-node.conf"
 
   sudo perl -pi -e "s/#html_strategy cgi/html_strategy cgi/" "/etc/munin/munin.conf"
   sudo perl -pi -e "s/#graph_strategy cgi/graph_strategy cgi/" "/etc/munin/munin.conf"
 
-#   _log "***** Add munin-node-config to /etc/munin/munin-node.conf"
-# 
+#   _print "Add munin-node-config to /etc/munin/munin-node.conf"
+#
 #   munin_node_config="
 # allow ^127\.0\.0\.1$\n
 # host 127.0.0.1\n
 # "
-# 
+#
 #   echo -e $munin_node_config | sudo tee -a /etc/munin/munin-node.conf > /dev/null
 
   # Find and replace
-  _log "***** Add nginx-stub-status to "$nginx_dir"/conf/nginx.conf"
+  _print "Add nginx-stub-status to "$nginx_dir"/conf/nginx.conf"
 
   stub_status_config="
 
         location \/nginx_status {
           stub_status on;
-          access_log off;
+          access_print off;
           allow 127.0.0.1;
           deny all;
         }
@@ -96,21 +98,21 @@ _munin() {
   search_string="s/[^#]server {/server {$stub_status_config/"
 
   sudo perl -pi -e "$search_string" $nginx_dir"/conf/nginx.conf"
-  
-  _log "***** Restart munin"
+
+  _print "Restart munin"
 
   sudo service munin-node restart
 
-  _log "***** Setup permissions for log files"
+  _print "Setup permissions for log files"
 
   sudo chmod 0777 /var/log/munin/*.log
 
-  _log "***** Configure graphing cgi-bins"
+  _print "Configure graphing cgi-bins"
 
   spawn-fcgi -s /var/run/munin/fastcgi-html.sock -U nobody -u munin -g munin /usr/lib/cgi-bin/munin-cgi-html
   spawn-fcgi -s /var/run/munin/fastcgi-graph.sock -U nobody -u munin -g munin /usr/lib/cgi-bin/munin-cgi-graph
 
-  _log "***** Add nginx virtual host for munin-stats"
+  _print "Add nginx virtual host for munin-stats"
 
   sudo touch $nginx_dir"/sites-available/stats.noort.be"
   sudo cat > $nginx_dir"/sites-available/stats.noort.be" <<EOS
@@ -118,8 +120,8 @@ server {
   listen        80;
   server_name   stats.noort.be;
 
-  access_log    /srv/logs/stats.noort.be.access.log;
-  error_log     /srv/logs/stats.noort.be.error.log;
+  access_print    /srv/logs/stats.noort.be.access.log;
+  error_print     /srv/logs/stats.noort.be.error.log;
 
   # pass the PHP scripts to FastCGI server
   location ~ \.php$ {
@@ -139,7 +141,7 @@ server {
   }
 
   location ^~ /cgi-bin/munin-cgi-graph/ {
-    access_log    off;
+    access_print    off;
     fastcgi_split_path_info ^(/cgi-bin/munin-cgi-graph)(.*);
     fastcgi_param PATH_INFO \$fastcgi_path_info;
     fastcgi_pass  unix:/var/run/munin/fastcgi-graph.sock;
@@ -160,37 +162,37 @@ server {
 EOS
 
   sudo ln -s $nginx_dir"/sites-available/stats.noort.be" $nginx_dir"/sites-enabled/stats.noort.be"
-  
-  _log "***** Restart nginx"
+
+  _print "Restart nginx"
 
   sudo /etc/init.d/nginx reload
 }
 
 _munin_ngxin_plugins() {
-  _log "***** Add munin plugins for requests, status and memory"
+  _print_h2 "Add munin plugins for requests, status and memory"
 
   cd /usr/share/munin/plugins
   sudo wget -O nginx_request https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_request
   sudo wget -O nginx_status https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_status
-  sudo wget -O nginx_memory https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_memory 
+  sudo wget -O nginx_memory https://raw.github.com/munin-monitoring/contrib/master/plugins/nginx/nginx_memory
 
   sudo chmod +x nginx_request
   sudo chmod +x nginx_status
-  sudo chmod +x nginx_memory    
+  sudo chmod +x nginx_memory
 
   sudo ln -s /usr/share/munin/plugins/nginx_request /etc/munin/plugins/nginx_request
   sudo ln -s /usr/share/munin/plugins/nginx_status /etc/munin/plugins/nginx_status
   sudo ln -s /usr/share/munin/plugins/nginx_memory /etc/munin/plugins/nginx_memory
 
-  _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
- 
+  _print "Edit /etc/munin/plugin-conf.d/munin-node"
+
   munin_env="\n
 [nginx*]\n
 env.url http://localhost/nginx_status\n
 "
 
   echo -e $munin_env | sudo tee -a /etc/munin/plugin-conf.d/munin-node > /dev/null
-  
+
 }
 
 ###############################################################################

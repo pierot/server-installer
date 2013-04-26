@@ -2,29 +2,36 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
+###############################################################################
+
+install_name='rbenv'
+
+###############################################################################
+
 _redirect_stdout 'rbenv'
 _check_root
+_print_h1 $install_name
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              rbenv.sh -h
+Usage:              $install_name.sh -h
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/rbenv.sh )
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh )
 
 Options:
- 
+
   -h                Show this message
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -36,23 +43,23 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 
 _rbenv() {
-	_log "Installing RBENV"
+	_print_h2 "Installing RBENV"
 
   # Delete when exists
   rm -rf $HOME/.rbenv
 
-  _log "***** Cloning rbenv git repo"
+  _print "Cloning rbenv git repo"
   # Clone into
   git clone git://github.com/sstephenson/rbenv.git $HOME/.rbenv
 
-  _log "***** Install ruby-build"
+  _print "Install ruby-build"
   # Install Ruby-Build
   mkdir -p $HOME/.rbenv/plugins
 
@@ -62,20 +69,20 @@ _rbenv() {
 
   source $HOME/.bash_profile
 
-  _log "***** Install ruby 1.9.3-p125"
+  _print "Install ruby 1.9.3-p125"
   rbenv install 1.9.3-p125
   rbenv global 1.9.3-p125
 
-  _log "***** Rbenv rehash"
+  _print "Rbenv rehash"
   rbenv rehash
 }
 
 _gem_config() {
-	_log "Updating Rubygems"
+	_print_h2 "Updating Rubygems"
 
   gem update --system
 
-	_log "***** Adding no-rdoc and no-ri rules to gemrc"
+	_print "Adding no-rdoc and no-ri rules to gemrc"
 
 	gemrc_settings="
 ---\n
@@ -98,7 +105,7 @@ update: --no-ri --no-rdoc --env-shebang\n
   echo -e $gemrc_settings | sudo tee -a /etc/skel/.gemrc > /dev/null
   echo -e $gemrc_settings | sudo tee -a ~/.gemrc > /dev/null
 
-	_log "***** Installing Bundler"
+	_print "Installing Bundler"
 
   gem install bundler
 }

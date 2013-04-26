@@ -8,6 +8,7 @@ wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . 
 
 _redirect_stdout $install_name
 _check_root
+_print_h1 $install_name
 
 ###############################################################################
 
@@ -19,16 +20,16 @@ Usage:              $install_name.sh -h
 Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh )
 
 Options:
- 
+
   -h                Show this message
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -40,15 +41,13 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 _node() {
-	_log "Install $install_name"
-
-  _log "***** Install dependencies"
+  _print_h2 "Install dependencies"
 
   _system_installs_install 'g++ curl libssl-dev apache2-utils python make'
 

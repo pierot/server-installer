@@ -5,6 +5,8 @@ dir_list=''
 
 # https://www.dropbox.com/install?os=lnx
 
+_print_h1 $install_name
+
 ###############################################################################
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
@@ -18,20 +20,20 @@ _usage() {
 
 Usage:              $install_name.sh -h [ -s 'DirName, Dir\ Name' ]
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [ -s 'DirName, Dir\ Name' ] 
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [ -s 'DirName, Dir\ Name' ]
 
 Options:
- 
+
   -h                Show this message
   -s                List of directories you want to exclude
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -46,17 +48,15 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 _dropbox() {
-	_log "Install $install_name"
-
   cd $HOME
 
-  _log "***** Download dropbox binaries"
+  _print_h2 "Download dropbox binaries"
 
   wget -O - "http://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 
@@ -66,29 +66,29 @@ _dropbox() {
 }
 
 _dropbox_manage() {
-	_log "Install $install_name and set up managers"
+	_print_h2 "Install $install_name and set up managers"
 
   mkdir $HOME/.dropbox-utils
   cd $HOME/.dropbox-utils
 
-  _log "***** Download dropbox control script"
+  _print "Download dropbox control script"
 
   wget -O ./dropbox.py "http://www.dropbox.com/download?dl=packages/dropbox.py"
   chmod +x dropbox.py
 
-  _log "***** Download dropbox init script"
+  _print "Download dropbox init script"
 
   wget -O ./dropbox.init.sh "http://raw.github.com/gist/3787880/2e3c1cfe2e62fd53ed735ea1c6179647bef85c1a/dropbix.init.sh"
 
   perl -pi -e "s/__users__/root/" "$HOME/.dropbox-utils/dropbox.init.sh"
 
-  _log "***** Create dropbox init script"
+  _print "Create dropbox init script"
 
   sudo mv ./dropbox.init.sh /etc/init.d/dropbox
   sudo chmod +x /etc/init.d/dropbox
   sudo update-rc.d dropbox defaults
 
-  _log "***** Test dropbox init script"
+  _print "Test dropbox init script"
 
   service dropbox status
   service dropbox start
@@ -97,7 +97,7 @@ _dropbox_manage() {
 }
 
 _dropbox_selective() {
-	_log "Selective sync $install_name"
+	_print_h2 "Selective sync $install_name"
 
 	if [ -z "$1" && -d "$HOME/.dropbox-utils" ]; then
     service dropbox status
@@ -110,7 +110,7 @@ _dropbox_selective() {
     i=0
 
     while [ $i -lt ${#list[@]} ]; do
-      ./dropbox.py exclude add "$i:${list[$i]}" 
+      ./dropbox.py exclude add "$i:${list[$i]}"
 
       (( i=i+1 ))
     done

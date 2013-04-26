@@ -4,6 +4,7 @@ wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . 
 
 _redirect_stdout 'base'
 _check_root
+_print_h1 'Base'
 
 ###############################################################################
 
@@ -21,18 +22,18 @@ Usage:              base.sh -h 'server_name.com' [-e 'production']
 Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/base.sh ) -s 'noort.be' [-e 'production']
 
 Options:
- 
+
   -h                    Show this message
   -s 'server_name.com'  Set server name
   -e 'environment'      Set RACK / RAILS environment variable
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -50,7 +51,7 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 if [ -z $server_name ]; then
@@ -64,7 +65,7 @@ fi
 _hostname() {
 	[[ -z "$1" ]] && return 1
 
-	_log "Setting hostname to $1"
+	_print_h2 "Setting hostname to $1"
 
   full_server_name=$1
 	short_server_name=`echo $full_server_name | awk -F. '{ print $1 }'`
@@ -77,7 +78,7 @@ _hostname() {
 }
 
 _system_installs() {
-	_log "System wide installs"
+	_print_h2 "System wide installs"
 
   sudo apt-get -qq update
   sudo apt-get -qq upgrade
@@ -85,7 +86,7 @@ _system_installs() {
   _system_installs_install 'aptitude'
 
   sudo aptitude -y full-upgrade
-  
+
   _system_installs_install 'build-essential bison openssl libreadline5 libreadline-dev curl git-core zlib1g make'
   _system_installs_install 'zlib1g-dev libssl-dev vim libcurl4-openssl-dev gcc'
   _system_installs_install 'libsqlite3-0 libsqlite3-dev sqlite3'
@@ -97,7 +98,7 @@ _system_installs() {
 }
 
 _system_auto_update() {
-	_log "Install auto periodic update"
+	_print_2 "Install auto periodic update"
 
 	_system_installs_install "unattended-upgrades"
 
@@ -110,7 +111,7 @@ EOF
 }
 
 _system_locales() {
-	_log "Fix locales"
+	_print_h2 "Fix locales"
 
   _system_installs_install 'multipath-tools'
 
@@ -125,7 +126,7 @@ _system_locales() {
 }
 
 _system_timezone() {
-	_log "System timezone"
+	_print_h2 "System timezone"
 
   sudo dpkg-reconfigure tzdata
 
@@ -137,9 +138,9 @@ _system_timezone() {
 }
 
 _setup_security() {
-	_log "Setup security"
+	_print_h2 "Setup security"
 
-  _log "***** Secure shared memory"
+  _print "***** Secure shared memory"
 
   sudo sh -c 'echo "tmpfs     /dev/shm     tmpfs     defaults,ro     0     0" >> /etc/fstab'
 
@@ -212,7 +213,7 @@ _setup_security() {
 }
 
 _ssh() {
-	_log "SSH Config"
+	_print_h2 "SSH Config"
 
   sudo perl -pi -e "s/Port 22/Port 33/" "/etc/ssh/sshd_config"
   sudo perl -pi -e "s/AcceptEnv LANG LC_*//" "/etc/ssh/sshd_config"
@@ -274,7 +275,7 @@ _firewall() {
 }
 
 _failtoban() {
-	_log "Install Fail2Ban"
+	_print_h2 "Install Fail2Ban"
 
   _system_installs_install 'fail2ban'
 
@@ -289,7 +290,7 @@ _failtoban() {
 }
 
 _env_variables() {
-	_log "Setting ENV variables"
+	_print_h2 "Setting ENV variables"
 
   sudo cat > /etc/environment <<EOF
 RAILS_ENV="$1"
@@ -298,15 +299,16 @@ EOF
 }
 
 _install_tmux() {
-	_log "Installing tmux"
+	_print_h2 "Installing tmux"
 
   _system_installs_install 'tmux'
 }
 
 _the_end() {
-	_log "Finishing"
+	_print_h2 "Finishing"
 
-  _log "***** Cleaning up"
+  _print "Cleaning up"
+
   sudo apt-get -qq autoremove
 }
 

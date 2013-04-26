@@ -8,6 +8,7 @@ wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . 
 
 _redirect_stdout $install_name
 _check_root
+_print_h1 $install_name
 
 ###############################################################################
 
@@ -19,23 +20,23 @@ nginx_dir='/opt/nginx'
 _usage() {
   _print "
 
-Usage:              $install_name -h [-n '$nginx_version' -d '$nginx_dir']
+Usage:              $install_name.sh -h [-n '$nginx_version' -d '$nginx_dir']
 
 Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) [-n '$nginx_version' -d '$nginx_dir']
 
 Options:
- 
+
   -h                Show this message
   -d '$nginx_dir'   Sets nginx install dir
   -n '$nginx_version'        nginx version number
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -53,40 +54,38 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 _nginx() {
-	_log "Install $install_name"
+  _print_h2 "Download $install_name source $1"
 
-  _log "***** Download $install_name source $1"
-  
   cd $temp_dir
   sudo wget "http://nginx.org/download/nginx-$1.tar.gz"
   sudo tar -xzvf "nginx-$1.tar.gz" > /dev/null
 
-  _log "***** Install $install_name"
+  _print "Install $install_name"
   cd $temp_dir/nginx-$1
 
   ./configure --prefix=$nginx_dir --with-http_stub_status_module --with-http_ssl_module
   make
   sudo make install
 
-  _log "***** Init $install_name start-up script"
+  _print "Init $install_name start-up script"
 
   curl -L -s https://raw.github.com/gist/1187950/c8825bf2e9c9243201e4e0e974626501592ce81e/nginx-init-d > ~/nginx
   sudo mv ~/nginx /etc/init.d/nginx
   sudo chmod +x /etc/init.d/nginx
   sudo /usr/sbin/update-rc.d -f nginx defaults
 
-  _log "***** Adding sites-folders"
+  _print "Adding sites-folders"
 
   sudo mkdir -p $nginx_dir"/sites-available"
   sudo mkdir -p $nginx_dir"/sites-enabled"
 
-  _log "***** Add nginx config"
+  _print "Add nginx config"
 
   nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
 
@@ -105,13 +104,13 @@ _nginx() {
 
   _add_nginx_config "\#tcp_nopush     on;" "tcp_nopush     on;\ntcp_nodelay        on;"
 
-  _log "***** Verify nginx status"
+  _print "Verify nginx status"
 
   sudo /etc/init.d/nginx start
   sudo /etc/init.d/nginx stop
   sudo /etc/init.d/nginx start
 
-  _log "!!!!! Do check the gzip settings:\n$gzip_config"
+  _print "!!!!! Do check the gzip settings:\n$gzip_config"
 }
 
 _add_nginx_config() {
@@ -119,7 +118,7 @@ _add_nginx_config() {
 }
 
 _php() {
-	_log "Install PHP"
+	_print_h2 "Install PHP"
 
   _system_installs_install 'php5-fpm php5-common'
   _system_installs_install 'php5-curl php5-gd php-pear php5-imagick php5-imap php5-mcrypt php5-sqlite php5-intl'
@@ -128,7 +127,7 @@ _php() {
 }
 
 _setup_www() {
-	_log "Setup www directories"
+	_print_h2 "Setup www directories"
 
   sudo mkdir -p /srv
   sudo mkdir -p /srv/www

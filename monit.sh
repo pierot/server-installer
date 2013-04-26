@@ -2,36 +2,40 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'monit'
-_check_root
+###############################################################################
+
+install_name='monit'
+server_name='tortuga'
+nginx_dir='/opt/nginx'
 
 ###############################################################################
 
-server_name='tortuga'
-nginx_dir='/opt/nginx'
+_redirect_stdout 'monit'
+_check_root
+_print_h1 $install_name
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              monit.sh [-n 'tortuga']
+Usage:              $install_name [-n 'tortuga']
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/monit.sh ) [-n 'tortuga'] [-d '/opt/nginx']
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name ) [-n 'tortuga'] [-d '/opt/nginx']
 
 Options:
- 
+
   -h                Show this message
   -n 'tortuga'      Sets server name
   -d '/opt/nginx'   Sets nginx install dir
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hs:n:d:e: opt; do 
+while getopts :hs:n:d:e: opt; do
   case $opt in
     h)
       _usage
@@ -49,17 +53,15 @@ while getopts :hs:n:d:e: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 ###############################################################################
 
 _monit() {
-  _log "Install Monit"
-
   _system_installs_install 'monit'
 
-  _log "***** Add monit-config to /etc/monit/conf.d/"$server_name
+  _print_h2 "Add monit-config to /etc/monit/conf.d/"$server_name
 
   monit_config="\n
 # setup\n
@@ -79,14 +81,14 @@ set httpd port 2812\n
 \n\n
 set logfile /var/log/monit.log\n
 "
-  
+
   echo -e $monit_config > /etc/monit/conf.d/$server_name
-  
-  _log "***** Restart monit"
+
+  _print "Restart monit"
 
   sudo service monit restart
 
-  _log "***** Add nginx virtual host for monit"
+  _print "Add nginx virtual host for monit"
 
   sudo touch $nginx_dir"/sites-available/monit.noort.be"
   sudo cat > $nginx_dir"/sites-available/monit.noort.be" <<EOS
@@ -94,8 +96,8 @@ server {
   listen 80;
   server_name monit.noort.be;
 
-  access_log /srv/logs/monit.noort.be.access.log;
-  error_log /srv/logs/monit.noort.be.error.log;
+  access_print /srv/logs/monit.noort.be.access.log;
+  error_print /srv/logs/monit.noort.be.error.log;
 
   location / {
     proxy_pass http://127.0.0.1:2812;
@@ -105,12 +107,12 @@ server {
 EOS
 
   sudo ln -s $nginx_dir"/sites-available/monit.noort.be" $nginx_dir"/sites-enabled/monit.noort.be"
-  
-  _log "***** Reload nginx"
+
+  _print "Reload nginx"
 
   sudo /etc/init.d/nginx reload
 
-  # _log "***** Restart varnish"
+  # _print "Restart varnish"
 
   # sudo /etc/init.d/varnish restart
 }

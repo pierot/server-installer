@@ -2,13 +2,20 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'varnish'
+###############################################################################
+
+install_name='varnish'
+
+###############################################################################
+
+_redirect_stdout $install_name
 _check_root
+_print_h1 $install_name
 
 ###############################################################################
 
 _install_varnish() {
-  _log "Install Varnish"
+  _print_h2 "Install Varnish"
 
   sudo curl http://repo.varnish-cache.org/debian/GPG-key.txt | apt-key add -
 
@@ -20,7 +27,7 @@ _install_varnish() {
 }
 
 _configure_varnish() {
-  _log "Configure Varnish"
+  _print_h2 "Configure Varnish"
 
   sudo mv /etc/default/varnish /etc/default/varnish.bak
 
@@ -35,13 +42,13 @@ EOF
   sudo mv /etc/varnish/default.vcl /etc/varnish/default.vcl.bak
 
   sudo cat > /etc/varnish/default.vcl <<EOF
-backend default { 
-  .host = "127.0.0.1"; 
-  .port = "8000"; 
-  .first_byte_timeout = 25s; 
-  .connect_timeout = 20s; 
-  .between_bytes_timeout = 30s; 
-} 
+backend default {
+  .host = "127.0.0.1";
+  .port = "8000";
+  .first_byte_timeout = 25s;
+  .connect_timeout = 20s;
+  .between_bytes_timeout = 30s;
+}
 
 acl purge {
   "localhost";
@@ -78,7 +85,7 @@ sub vcl_recv {
 
     return(lookup);
   }
- 
+
   return(lookup);
 }
 
@@ -114,7 +121,7 @@ EOF
 _link_munin_varnish() {
   # https://github.com/basiszwo/munin-varnish
 
-  _log "Add munin plugins for requests, status and memory"
+  _print_h2 "Add munin plugins for requests, status and memory"
 
   cd /usr/share/munin/plugins
 
@@ -124,20 +131,20 @@ _link_munin_varnish() {
 
   sudo git clone git://github.com/basiszwo/munin-varnish.git
   sudo chmod a+x /usr/share/munin/plugins/munin-varnish/varnish_*
-  
+
   sudo rm -f /etc/munin/plugins/varnish_*
   sudo ln -s /usr/share/munin/plugins/munin-varnish/varnish_* /etc/munin/plugins/
 
-  _log "***** Edit /etc/munin/plugin-conf.d/munin-node"
- 
+  _print "Edit /etc/munin/plugin-conf.d/munin-node"
+
   munin_env="\n
 [varnish*]\n
 user root\n
 "
 
   echo -e $munin_env | sudo tee -a /etc/munin/plugin-conf.d/munin-node > /dev/null
-  
-  _log "***** Restart munin"
+
+  _print "Restart munin"
 
   sudo service munin-node restart
 }

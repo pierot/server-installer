@@ -2,34 +2,38 @@
 
 wget -N --quiet https://raw.github.com/pierot/server-installer/master/lib.sh; . ./lib.sh
 
-_redirect_stdout 'postgresql'
-_check_root
-
 ###############################################################################
 
 db_pass=
+install_name='postgresql'
+
+###############################################################################
+
+_redirect_stdout $install_name
+_check_root
+_print_h1 $install_name
 
 ###############################################################################
 
 _usage() {
   _print "
 
-Usage:              postgresql.sh -p 'password'
+Usage:              $install_name.sh -p 'password'
 
-Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/postgresql.sh ) -p 'password'
+Remote Usage:       bash <( curl -s https://raw.github.com/pierot/server-installer/master/$install_name.sh ) -p 'password'
 
 Options:
- 
+
   -h                Show this message
   -p 'password'     Password
   "
 
   exit 0
-} 
+}
 
 ###############################################################################
 
-while getopts :hp: opt; do 
+while getopts :hp: opt; do
   case $opt in
     h)
       _usage
@@ -44,7 +48,7 @@ while getopts :hp: opt; do
 
       exit 0
       ;;
-  esac 
+  esac
 done
 
 if [ -z $db_pass ]; then
@@ -56,11 +60,11 @@ fi
 ###############################################################################
 
 _postgresql() {
-  _log "Install postgresql"
+  _print_h2 "Install postgresql"
 
   _system_installs_install 'postgresql postgresql-contrib postgresql-client libpq-dev'
 
-  _log "***** pg_hba.conf"
+  _print "pg_hba.conf"
 
   pg_conf=$(find /etc/ -name "pg_hba.conf" | head -n 1)
 
@@ -69,16 +73,16 @@ _postgresql() {
   # Make sure linux can access through 'postgres' account
   sudo sed -i -e  's/^local   all             postgres                                peer$/local   all             postgres                                md5/g' $pg_conf
 
-  _log "***** Alter postgres user"
+  _print "Alter postgres user"
 
   PSQL_COMMAND="psql -c \"ALTER USER postgres WITH PASSWORD '$db_pass';\""
 
   sudo su - postgres -c "$PSQL_COMMAND"
 
-  _log "***** Restart postgresql"
+  _print "Restart postgresql"
   sudo /etc/init.d/postgresql restart
 
-  _log "***** Postgresql status"
+  _print "Postgresql status"
   sudo /etc/init.d/postgresql status
 }
 
