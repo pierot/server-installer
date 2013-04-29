@@ -42,8 +42,7 @@ _system_installs_install() {
 }
 
 _check_root() {
-  if [ $(/usr/bin/id -u) != "0" ]
-  then
+  if [ $(/usr/bin/id -u) != "0" ]; then
     _error 'Must be run by root user'
 
     exit 0
@@ -58,4 +57,10 @@ _cleanup_lib() {
 
 _note_installation() {
   touch "$HOME/$1-installed"
+}
+
+_unix_time() {
+  now=`date`
+
+  return `date -j -f "%a %b %d %T %Z %Y" "$now" "+%s"`
 }
