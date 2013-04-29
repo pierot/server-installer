@@ -62,5 +62,5 @@ _note_installation() {
 _unix_time() {
   now=`date`
 
-  return `date -j -f "%a %b %d %T %Z %Y" "$now" "+%s"`
+  echo `date -j -f "%a %b %d %T %Z %Y" "$now" "+%s"`
 }
