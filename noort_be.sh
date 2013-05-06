@@ -64,12 +64,17 @@ _setup_noort() {
   sudo cat > $nginx_dir"/sites-available/noort.be" <<EOS
 server {
   listen 80;
+  listen [::]:80;
+
   server_name www.noort.be;
+
   rewrite ^ http://noort.be$uri permanent;
 }
 
 server {
   listen 80;
+  listen [::]:80;
+
   server_name noort.be;
 
   access_print /srv/logs/noort.be.access.log;
@@ -84,7 +89,7 @@ EOS
 
   sudo ln -s $nginx_dir"/sites-available/noort.be" $nginx_dir"/sites-enabled/noort.be"
 
-  _print "Restart nginx"
+  _print "Reload nginx"
 
   sudo /etc/init.d/nginx reload
 }
@@ -98,6 +103,8 @@ _setup_site() {
   sudo cat > $nginx_dir"/sites-available/$1" <<EOS
 server {
   listen 80;
+  listen [::]:80;
+
   server_name $1;
 
   access_print /srv/logs/$1.access.log;
@@ -112,7 +119,7 @@ EOS
 
   sudo ln -s $nginx_dir"/sites-available/$1" $nginx_dir"/sites-enabled/$1"
 
-  _print "Restart nginx"
+  _print "Reload nginx"
 
   sudo /etc/init.d/nginx reload
 }

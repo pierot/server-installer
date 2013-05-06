@@ -12,7 +12,7 @@ _print_h1 $install_name
 
 ###############################################################################
 
-nginx_version="1.2.7"
+nginx_version="1.4.0"
 nginx_dir='/opt/nginx'
 
 ###############################################################################
@@ -69,7 +69,7 @@ _nginx() {
   _print "Install $install_name"
   cd $temp_dir/nginx-$1
 
-  ./configure --prefix=$nginx_dir --with-http_stub_status_module --with-http_ssl_module
+  ./configure --prefix=$nginx_dir --with-http_stub_status_module --with-http_ssl_module --with-http_spdy_module --with-ipv6 --with-sha1=/usr/include/openssl --with-md5=/usr/include/openssl --with-mail --with-mail_ssl_module --with-http_gzip_static_module
   make
   sudo make install
 
@@ -90,7 +90,8 @@ _nginx() {
   nginx_dir_escaped=`echo $nginx_dir | sed 's/\//\\\\\//g'`
 
   sites_enabled_config="http {\ninclude $nginx_dir_escaped\/sites-enabled\/*;"
-  gzip_config="gzip            on;\ngzip_comp_level 3;\ngzip_types      text/plain application/xml text/javascript text/css application/json application/x-javascript text/html;\ngzip_disable    \"msie6\";"
+  extra_config="\n\nserver_names_hash_bucket_size  64;"
+  gzip_config="gzip            on;\ngzip_comp_level 3;\ngzip_types      text/plain application/xml text/javascript text/css application/json application/x-javascript text/html;\ngzip_disable    \"msie6\";$extra_config"
 
   _add_nginx_config "http {" "$sites_enabled_config"
   _add_nginx_config "http {" "http {\nserver_tokens off;"
