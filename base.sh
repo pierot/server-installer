@@ -85,7 +85,9 @@ _hostname() {
 	sudo sh -c "echo '127.0.0.1 $full_server_name $short_server_name localhost' >> /etc/hosts"
 	sudo hostname -F /etc/hostname
 
-  sudo perl -pi -e "s/SET_HOSTNAME=\'yes\'/#SET_HOSTNAME=\'yes\'/" "/etc/default/dhcpcd"
+  if [ -f /etc/default/dhcpcd ]; then
+    sudo perl -pi -e "s/SET_HOSTNAME=\'yes\'/#SET_HOSTNAME=\'yes\'/" "/etc/default/dhcpcd"
+  fi
 }
 
 _system_installs() {
@@ -94,9 +96,9 @@ _system_installs() {
   sudo apt-get -qq update
   sudo apt-get -qq upgrade
 
-  _system_installs_install 'aptitude'
+  # _system_installs_install 'aptitude'
 
-  sudo aptitude -y full-upgrade
+  # sudo aptitude -y full-upgrade
 
   _system_installs_install 'build-essential bison openssl libreadline5 libreadline-dev curl git-core zlib1g make'
   _system_installs_install 'zlib1g-dev libssl-dev vim libcurl4-openssl-dev gcc'
