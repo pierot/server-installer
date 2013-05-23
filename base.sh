@@ -93,7 +93,7 @@ _hostname() {
 _system_installs() {
 	_print_h2 "System wide installs"
 
-  # sudo apt-get -qq update
+  sudo apt-get -qq update
   # sudo apt-get -qq upgrade
 
   # _system_installs_install 'aptitude'
