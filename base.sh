@@ -141,7 +141,9 @@ _system_locales() {
 _system_timezone() {
 	_print_h2 "System timezone"
 
-  sudo dpkg-reconfigure tzdata
+  echo "Europe/Brussels" > /etc/timezone
+
+  sudo dpkg-reconfigure -f noninteractive tzdata
 
   sudo cp /usr/share/zoneinfo/Europe/Brussels /etc/localtime
 
